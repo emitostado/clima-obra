@@ -7,6 +7,9 @@ body {
   color: #1e293b;
   background: #eaf4f8;
 }
+
+/* ENCABEZADO */
+
 header {
   background: linear-gradient(135deg, #0284c7, #38bdf8);
   color: white;
@@ -25,6 +28,9 @@ header h1 {
 header p {
   margin: 0;
 }
+
+/* SECCIONES */
+
 section {
   background: white;
 
@@ -42,19 +48,29 @@ section h2 {
   color: #0f5f7a;
 }
 
+/* INFORMACIÓN DEL CLIMA */
+
 .weather-info {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
 .weather-info > div {
-  flex: 1;
-
   padding: 18px;
 
   border-radius: 10px;
   text-align: center;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.weather-info > div:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* TEMPERATURA */
 
 .temperature {
   background: #fff7d6;
@@ -68,9 +84,13 @@ section h2 {
 .temperature p {
   font-size: 28px;
   font-weight: bold;
+
   color: #ea580c;
+
   margin: 10px 0 0;
 }
+
+/* VIENTO */
 
 .wind {
   background: #eef2ff;
@@ -84,9 +104,53 @@ section h2 {
 .wind p {
   font-size: 28px;
   font-weight: bold;
+
   color: #4338ca;
+
   margin: 10px 0 0;
 }
+
+/* HUMEDAD */
+
+.humedad {
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+}
+
+.humedad strong {
+  color: #0891b2;
+}
+
+.humedad p {
+  font-size: 28px;
+  font-weight: bold;
+
+  color: #0e7490;
+
+  margin: 10px 0 0;
+}
+
+/* PRECIPITACIÓN */
+
+.precipitacion {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.precipitacion strong {
+  color: #2563eb;
+}
+
+.precipitacion p {
+  font-size: 28px;
+  font-weight: bold;
+
+  color: #1d4ed8;
+
+  margin: 10px 0 0;
+}
+
+/* CARACTERÍSTICAS */
 
 #caracteristicas ul {
   padding-left: 20px;
@@ -95,6 +159,8 @@ section h2 {
 #caracteristicas li {
   margin-bottom: 8px;
 }
+
+/* TABLA */
 
 table {
   width: 100%;
@@ -117,8 +183,27 @@ tr:last-child td {
   border-bottom: none;
 }
 
+/* RESPONSIVE */
+
 @media (max-width: 500px) {
+
+  body {
+    margin: 20px auto;
+  }
+
+  header {
+    padding: 20px;
+  }
+
+  section {
+    padding: 16px;
+  }
+
   .weather-info {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+
+  .weather-info > div {
+    padding: 16px;
   }
 }
