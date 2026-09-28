@@ -6,13 +6,16 @@
   <title>Clima de obra</title>
   <link rel="stylesheet" href="estilos.css">
 </head>
+
 <body>
+
   <header>
     <h1>Clima de obra</h1>
     <p>Condiciones actuales en el sitio del proyecto.</p>
   </header>
 
   <main>
+
     <section id="proyecto">
       <h2>Proyecto</h2>
       <p>Nombre: Torre de ejemplo</p>
@@ -21,11 +24,66 @@
 
     <section id="clima">
       <h2>Ahora mismo</h2>
-      <p id="temperatura">Cargando...</p>
-      <p id="viento">Cargando...</p>
+
+      <div class="weather-info">
+
+        <div class="temperature">
+          <strong>Temperatura</strong>
+          <p id="temperatura">Cargando...</p>
+        </div>
+
+        <div class="wind">
+          <strong>Viento</strong>
+          <p id="viento">Cargando...</p>
+        </div>
+
+      </div>
     </section>
+
+    <section id="caracteristicas">
+      <h2>Características</h2>
+
+      <ul>
+        <li>5 edificios</li>
+        <li>5 niveles</li>
+        <li>60 unidades de departamentos</li>
+      </ul>
+    </section>
+
+    <section id="ficha">
+      <h2>Ficha del proyecto</h2>
+
+      <table>
+        <tr>
+          <th>Dato</th>
+          <th>Valor</th>
+        </tr>
+
+        <tr>
+          <td>Nombre</td>
+          <td>EMBÁ</td>
+        </tr>
+
+        <tr>
+          <td>Tipo</td>
+          <td>Residencial / Hotelero</td>
+        </tr>
+
+        <tr>
+          <td>Ubicación</td>
+          <td>La Peñita de Jaltemba</td>
+        </tr>
+
+        <tr>
+          <td>Etapa</td>
+          <td>Preconstrucción</td>
+        </tr>
+      </table>
+    </section>
+
   </main>
 
   <script src="app.js"></script>
+
 </body>
 </html>
