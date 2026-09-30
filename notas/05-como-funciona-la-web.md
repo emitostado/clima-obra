@@ -138,9 +138,11 @@ datos.current.wind_speed_10m           →  5.5
 
 ## Sin internet 
 
+> sale el dinosaurio cuando no se tiene internet.
+
 > ![sale el dinosaurio de sin internet](sin-internet.png)
 
-## Linea de error " ) "
+## Línea de error " ) "
 
 > Uncaught SyntaxError: Unexpected token ')' 
 
