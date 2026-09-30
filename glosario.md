@@ -1,4 +1,4 @@
-## glosario 
+### glosario 
 
 ## HTTP O HTTPS
 
@@ -6,7 +6,7 @@
 
 ## Codigo de estado
 
->
+> 
 
 ## HTML 
 

@@ -149,3 +149,7 @@ datos.current.wind_speed_10m           →  5.5
 ## try y catch 
 
 > try...catch en JavaScript es la estructura diseñada para manejar errores de forma controlada y evitar que la aplicación se congele o se rompa por completo. Cuando una operación falla (por ejemplo, una API de clima no responde o hay un error de red), el bloque try detiene su ejecución inmediatamente y transfiere el control al bloque catch, permitiéndote actualizar la interfaz de usuario con un mensaje claro en lugar de dejar un indicador de «Cargando...» de forma indefinida.
+
+## Tu página está publicada en GitHub Pages. Cuando alguien la abre desde su celular, ¿quién le pide el clima a Open-Meteo: el servidor de GitHub o el celular de esa persona?
+
+> Cuando alguien abre mi página desde su celular, el celular de esa persona es quien le pide el clima a Open-Meteo, no el servidor de GitHub, Esto pasa porque GitHub Pages solamente entrega los archivos de la página, como el HTML, CSS y JavaScript. Después, el JavaScript se ejecuta en el navegador del celular y desde ahí se hace la petición a Open-Meteo para obtener los datos del clima, Para demostrarlo, abrí mi página publicada y revisé la pestaña Network de DevTools. Ahí pude observar las peticiones que realiza la página y encontré la petición hacia Open-Meteo. Esto demuestra que el navegador del celular es quien realiza la petición a la API y recibe la respuesta con los datos del clima.
