@@ -1,21 +1,13 @@
-// ---------------------------------------------------------------
-// Obras que se muestran en la pagina.
-// PENDIENTE: cambiar las dos ultimas por obras reales de Sohersa.
-// Las coordenadas se sacan de Google Maps: clic derecho sobre el punto.
-// ---------------------------------------------------------------
 const obras = [
   { nombre: "EMBA", lat: 21.03829, lon: -105.25024 },
-  { nombre: "Obra 2 (cambiar)", lat: 20.67360, lon: -103.34400 },
-  { nombre: "Obra 3 (cambiar)", lat: 19.43260, lon: -99.13320 }
+  { nombre: "Ejemplo - Guadalajara", lat: 20.67360, lon: -103.34400 },
+  { nombre: "Ejemplo - CDMX", lat: 19.43260, lon: -99.13320 }
 ];
-
-// PENDIENTE: confirmar estos limites con el equipo de obra de Sohersa.
-// Los valores de abajo son de referencia generica, NO son criterios de la empresa.
 const LIMITES = {
-  tempMaxima: 32,      // C
-  tempMinima: 5,       // C
-  vientoMaximo: 30,    // km/h
-  humedadMinima: 40    // %
+  tempMaxima: 32,      
+  tempMinima: 5,       
+  vientoMaximo: 30,    
+  humedadMinima: 40    
 };
 
 function urlDe(obra) {
