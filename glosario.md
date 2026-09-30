@@ -4,37 +4,39 @@
 
 > Es el idioma en el que se comunican los servidores entre si y la S es el cifrado de la informacion.
 
-## Codigo de estado
+## Código de estado
 
-> 
+> Indica el resultado de una solicitud web.
 
 ## HTML 
 
->
+> Crea la estructura de una página web.
 
 ## CSS
 
->
+> Da estilo y diseño a una página web.
 
 ## JavaScript
 
->
+> Agrega interactividad a una página web.
+
 
 ## DOM 
 
->
+> Representa la estructura de una página HTML.
 
 ## API 
 
->
+> Permite la comunicación entre aplicaciones.
 
 ## JSON 
 
->
+> Formato para almacenar e intercambiar datos.
 
 ## GitHub Pages
 
->
+> Permite publicar páginas web desde GitHub.
+
 ## Selector
 
 > Indica qué elemento HTML quieres modificar con CSS.

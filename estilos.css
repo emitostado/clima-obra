@@ -207,3 +207,24 @@ tr:last-child td {
     padding: 16px;
   }
 }
+
+#actualizar {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #0284c7;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#actualizar:hover {
+  background: #0369a1;
+}
+
+#ultima-actualizacion {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
