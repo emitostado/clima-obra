@@ -53,7 +53,7 @@
 <p>        → Texto
 <script>   → JavaScripT
 
-# PREGUNTA
+### PREGUNTA
  1** ¿qué es lo que hace el atributo id? ¿Por qué el <script> está hasta abajo y no en el <head>?
  
  >id sirve para darle un nombre unico a las cosas o elementos y <script> primero carga el HTML y despues JAVASCRIPT.
@@ -138,7 +138,7 @@ datos.current.wind_speed_10m           →  5.5
 
 ## Sin internet 
 
-> ![La página sin internet: los datos se quedan en Cargando](sin-internet.png)
+> ![sale el dinosaurio de sin internet](sin-internet.png)
 
 ## Linea de error " ) "
 
