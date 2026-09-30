@@ -125,3 +125,32 @@
 ## Primer elemento
 
 > Se obtiene con [0], porque los arreglos comienzan desde cero.
+
+## fetch(url)
+
+> Pide datos a una API.
+
+## async
+
+> Permite usar await en una función.
+
+## await
+
+> Espera los datos sin congelar la página.
+
+## respuesta.json()
+
+> Convierte la respuesta en datos utilizables.
+
+## datos.current.temperature_2m
+ 
+> Obtiene la temperatura actual.
+
+## document.getElementById("temperatura")
+
+> Busca el elemento HTML con ese id.
+
+## .textContent
+ 
+> Cambia el texto que aparece en la página.
+
