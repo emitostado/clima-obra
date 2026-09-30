@@ -1,26 +1,41 @@
 const url = "https://api.open-meteo.com/v1/forecast?latitude=21.03829&longitude=-105.25024&current=temperature_2m%2Crelative_humidity_2m%2Cprecipitation%2Cwind_speed_10m&timezone=America%2FMazatlan";
 
 async function cargarClima() {
-  const respuesta = await fetch(url);
-  const datos = await respuesta.json();
-  console.log(datos);
+  try {
+    const respuesta = await fetch(url);
 
-  const temp = datos.current.temperature_2m;
-  const viento = datos.current.wind_speed_10m;
-  const humedad = datos.current.relative_humidity_2m;
-  const precipitacion = datos.current.precipitation;
+    if (!respuesta.ok) {
+      throw new Error("Error al obtener los datos del clima");
+    }
 
-  document.getElementById("humedad").textContent =
-    "Humedad: " + humedad + " %";
+    const datos = await respuesta.json();
+    console.log(datos);
 
-  document.getElementById("precipitacion").textContent =
-    "Precipitación: " + precipitacion + " mm";
+    const temp = datos.current.temperature_2m;
+    const viento = datos.current.wind_speed_10m;
+    const humedad = datos.current.relative_humidity_2m;
+    const precipitacion = datos.current.precipitation;
 
-  document.getElementById("temperatura").textContent =
-    "Temperatura: " + temp + " °C";
+    document.getElementById("humedad").textContent =
+      "Humedad: " + humedad + " %";
 
-  document.getElementById("viento").textContent =
-    "Viento: " + viento + " km/h";
+    document.getElementById("precipitacion").textContent =
+      "Precipitación: " + precipitacion + " mm";
+
+    document.getElementById("temperatura").textContent =
+      "Temperatura: " + temp + " °C";
+
+    document.getElementById("viento").textContent =
+      "Viento: " + viento + " km/h";
+
+  } catch (error) {
+    console.error("Ocurrió un error:", error);
+
+    document.getElementById("humedad").textContent = "Error al cargar el clima";
+    document.getElementById("precipitacion").textContent = "Error al cargar el clima";
+    document.getElementById("temperatura").textContent = "Error al cargar el clima";
+    document.getElementById("viento").textContent = "Error al cargar el clima";
+  }
 }
 
 cargarClima();
