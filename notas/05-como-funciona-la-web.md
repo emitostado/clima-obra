@@ -138,7 +138,7 @@ datos.current.wind_speed_10m           →  5.5
 
 ## Sin internet 
 
-> sale el dinosaurio cuando no se tiene internet.
+> En esta evidencia se muestra el comportamiento de la página cuando el sitio carga correctamente, pero la API del clima no responde debido a la falta de conexión a Internet. Los elementos de la página permanecen visibles y los datos del clima quedan en estado “Cargando…”, permitiendo comprobar la importancia de utilizar try/catch para manejar correctamente los errores y evitar que la aplicación quede esperando indefinidamente.
 
 > ![sale el dinosaurio de sin internet](sin-internet.png)
 
