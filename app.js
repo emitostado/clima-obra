@@ -28,6 +28,10 @@ async function cargarClima() {
     document.getElementById("viento").textContent =
       "Viento: " + viento + " km/h";
 
+    const ahora = new Date();
+    document.getElementById("ultima-actualizacion").textContent =
+      "Última actualización: " + ahora.toLocaleTimeString("es-MX");
+
   } catch (error) {
     console.error("Ocurrió un error:", error);
 
@@ -39,3 +43,4 @@ async function cargarClima() {
 }
 
 cargarClima();
+document.getElementById("actualizar").addEventListener("click", cargarClima);
