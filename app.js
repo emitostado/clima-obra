@@ -1,7 +1,7 @@
 const obras = [
   { nombre: "EMBA", lat: 21.03829, lon: -105.25024 },
-  { nombre: "Ejemplo - Guadalajara", lat: 20.67360, lon: -103.34400 },
-  { nombre: "Ejemplo - CDMX", lat: 19.43260, lon: -99.13320 }
+  { nombre: "janemba", lat: 20.67360, lon: -103.34400 },
+  { nombre: "goku", lat: 19.43260, lon: -99.13320 }
 ];
 const LIMITES = {
   tempMaxima: 32,      
