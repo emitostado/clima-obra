@@ -553,7 +553,10 @@ function agregarSiluetas(escenario, obra) {
 function construirEscena(clima, m) {
   const escenario = document.getElementById("escena");
   document.body.dataset.clima = clima.escena;
-  document.body.dataset.momento = clima.esDia ? "dia" : "noche";
+  // Si el tema está en manual, no se le cambia debajo al usuario.
+  if (temaElegido === "auto") {
+    document.body.dataset.momento = clima.esDia ? "dia" : "noche";
+  }
   escenario.innerHTML = "";
 
   const nubesPorCielo = Math.round(limitar((m.nubes || 0) / 18, 1, 6));
@@ -683,13 +686,7 @@ function pintarPortada(obra) {
   chips.innerHTML = "";
   chips.appendChild(nodo("span", "chip chip-estado", escapar(obra.estado)));
   chips.appendChild(nodo("span", "chip", escapar(obra.tipo)));
-  chips.appendChild(nodo("span", "chip", escapar(obra.etapa)));
-  chips.appendChild(
-    nodo("span", "chip chip-tenue", "Inicio: " + escapar(obra.inicio))
-  );
-  chips.appendChild(
-    nodo("span", "chip chip-tenue", "Meta: " + escapar(obra.fin))
-  );
+  chips.appendChild(nodo("span", "chip chip-tenue", escapar(obra.etapa)));
 
   // Barra de avance
   const relleno = document.getElementById("avanceRelleno");
@@ -1299,7 +1296,541 @@ async function pintarFlota() {
 }
 
 /* ------------------------------------------------------------
-   9. Reloj de la obra
+   9. Centro de datos: seguimiento del proyecto
+   ------------------------------------------------------------ */
+
+const MESES = [
+  "ene", "feb", "mar", "abr", "may", "jun",
+  "jul", "ago", "sep", "oct", "nov", "dic"
+];
+
+/** "2026-08" -> "ago 2026" */
+function etiquetaFecha(fecha) {
+  const anio = fecha.slice(0, 4);
+  const mes = Number(fecha.slice(5, 7));
+  if (!mes) {
+    return anio;
+  }
+  return MESES[mes - 1] + " " + anio;
+}
+
+/** Convierte "2026-08" en un número de meses, para poder restar. */
+function mesesDe(fecha) {
+  return Number(fecha.slice(0, 4)) * 12 + (Number(fecha.slice(5, 7)) || 1) - 1;
+}
+
+function mesesHoy() {
+  const ahora = new Date();
+  return ahora.getFullYear() * 12 + ahora.getMonth();
+}
+
+/** Tarjetas grandes con las cifras que resumen la semana. */
+function pintarKpis(datos, riesgo, obra) {
+  const porDia = datos.daily;
+  const porHora = datos.hourly;
+  const inicio = indiceHoraActual(datos);
+
+  let diasAptos = 0;
+  let lluviaSemana = 0;
+  for (let i = 0; i < porDia.time.length; i++) {
+    const riesgoDia = calcularRiesgo({
+      aparente: porDia.temperature_2m_max[i],
+      humedad: 60,
+      precipitacion: porDia.precipitation_sum[i] / 8,
+      probabilidad: porDia.precipitation_probability_max[i],
+      viento: porDia.wind_speed_10m_max[i],
+      rafaga: porDia.wind_speed_10m_max[i],
+      uv: porDia.uv_index_max[i]
+    });
+    if (riesgoDia.nivel.clave === "optimo" || riesgoDia.nivel.clave === "aceptable") {
+      diasAptos++;
+    }
+    lluviaSemana += porDia.precipitation_sum[i] || 0;
+  }
+
+  let horasAptas = 0;
+  const fin = Math.min(inicio + 24, porHora.time.length);
+  for (let i = inicio; i < fin; i++) {
+    const riesgoHora = calcularRiesgo({
+      aparente: porHora.apparent_temperature[i],
+      humedad: porHora.relative_humidity_2m[i],
+      precipitacion: porHora.precipitation[i],
+      probabilidad: porHora.precipitation_probability[i],
+      viento: porHora.wind_speed_10m[i],
+      rafaga: porHora.wind_gusts_10m[i],
+      uv: porHora.uv_index[i]
+    });
+    if (riesgoHora.indice < 40) {
+      horasAptas++;
+    }
+  }
+
+  const linea = CRONOLOGIA[obra.id];
+  const mesesRestantes = linea ? mesesDe(linea.hasta) - mesesHoy() : null;
+
+  const tarjetas = [
+    {
+      icono: "📅",
+      valor: diasAptos,
+      unidad: "de 7",
+      etiqueta: "Días aptos para colar",
+      detalle: "En el pronóstico de la semana",
+      nivel: diasAptos >= 5 ? "optimo" : diasAptos >= 3 ? "aceptable" : "precaucion"
+    },
+    {
+      icono: "⏱️",
+      valor: horasAptas,
+      unidad: "de 24",
+      etiqueta: "Horas aptas",
+      detalle: "Con índice de riesgo por debajo de 40",
+      nivel: horasAptas >= 14 ? "optimo" : horasAptas >= 7 ? "aceptable" : "precaucion"
+    },
+    {
+      icono: "🌧️",
+      valor: redondear(lluviaSemana, 1),
+      unidad: "mm",
+      etiqueta: "Lluvia de la semana",
+      detalle: "Acumulado de los próximos 7 días",
+      nivel: lluviaSemana > 40 ? "critico" : lluviaSemana > 12 ? "precaucion" : "optimo"
+    },
+    {
+      icono: "🎯",
+      valor: mesesRestantes === null
+        ? "—"
+        : (mesesRestantes > 0 ? mesesRestantes : 0),
+      unidad: mesesRestantes === null ? "" : "meses",
+      etiqueta: "Para la meta",
+      detalle: linea ? "Meta: " + etiquetaFecha(linea.hasta) : "Sin fecha registrada",
+      nivel: "neutro"
+    },
+    {
+      icono: "⚠️",
+      valor: riesgo.indice,
+      unidad: "/100",
+      etiqueta: "Riesgo ahora",
+      detalle: riesgo.nivel.sello,
+      nivel: riesgo.nivel.clave
+    }
+  ];
+
+  const tablero = document.getElementById("tableroKpi");
+  tablero.innerHTML = "";
+  for (const tarjeta of tarjetas) {
+    const caja = nodo("div", "kpi");
+    caja.dataset.nivel = tarjeta.nivel;
+    caja.innerHTML =
+      '<span class="kpi-icono" aria-hidden="true">' + tarjeta.icono + '</span>' +
+      '<strong class="kpi-valor">' + tarjeta.valor +
+      (tarjeta.unidad ? '<em>' + tarjeta.unidad + '</em>' : '') + '</strong>' +
+      '<span class="kpi-etiqueta">' + escapar(tarjeta.etiqueta) + '</span>' +
+      '<small class="kpi-detalle">' + escapar(tarjeta.detalle) + '</small>';
+    tablero.appendChild(caja);
+  }
+
+  document.getElementById("centroSello").textContent =
+    diasAptos + " de 7 días aptos · " + horasAptas + " de 24 horas aptas";
+}
+
+/**
+ * Compara cuánto calendario lleva corrido la obra contra cuánto
+ * avance reporta. Si el avance va por delante del tiempo, la obra
+ * va holgada; si va por detrás, va apretada.
+ */
+function pintarCalendario(obra) {
+  const linea = CRONOLOGIA[obra.id];
+  const pista = document.getElementById("calendarioPista");
+  const nota = document.getElementById("calendarioNota");
+
+  if (!linea) {
+    pista.hidden = true;
+    nota.textContent = "Esta obra no tiene fechas registradas.";
+    return;
+  }
+  pista.hidden = false;
+
+  const total = mesesDe(linea.hasta) - mesesDe(linea.desde);
+  const corrido = mesesHoy() - mesesDe(linea.desde);
+  const tiempo = limitar((corrido / total) * 100, 0, 100);
+
+  document.getElementById("calendarioDesde").textContent =
+    "Inicio · " + etiquetaFecha(linea.desde);
+  document.getElementById("calendarioHasta").textContent =
+    "Meta · " + etiquetaFecha(linea.hasta);
+
+  const barraTiempo = document.getElementById("calendarioTiempo");
+  const barraAvance = document.getElementById("calendarioAvance");
+  const marca = document.getElementById("calendarioHoy");
+  barraTiempo.style.width = "0%";
+  barraAvance.style.width = "0%";
+  requestAnimationFrame(function () {
+    barraTiempo.style.width = tiempo.toFixed(1) + "%";
+    barraAvance.style.width = (obra.avance === null ? 0 : obra.avance) + "%";
+  });
+  marca.style.left = tiempo.toFixed(1) + "%";
+
+  const veredicto = document.getElementById("calendarioVeredicto");
+  if (obra.avance === null) {
+    veredicto.textContent = Math.round(tiempo) + " % del calendario";
+    veredicto.dataset.nivel = "neutro";
+    nota.textContent =
+      "Lleva " + Math.round(tiempo) + " % del calendario corrido. " +
+      "No hay porcentaje de avance oficial con el cual compararlo. " +
+      "Las fechas son aproximadas: varios proyectos solo publican el año.";
+    return;
+  }
+
+  const diferencia = obra.avance - tiempo;
+  let texto;
+  let nivel;
+  if (diferencia >= 8) {
+    texto = "Avance por delante del calendario";
+    nivel = "optimo";
+  } else if (diferencia >= -8) {
+    texto = "Avance a la par del calendario";
+    nivel = "aceptable";
+  } else {
+    texto = "Avance por detrás del calendario";
+    nivel = "precaucion";
+  }
+  veredicto.textContent = texto;
+  veredicto.dataset.nivel = nivel;
+  nota.textContent =
+    "Lleva " + Math.round(tiempo) + " % del calendario corrido contra " +
+    obra.avance + " % de avance reportado: " +
+    (diferencia >= 0 ? "+" : "") + Math.round(diferencia) +
+    " puntos. Las fechas son aproximadas, porque varios proyectos solo publican el año.";
+}
+
+function pintarCronologia(obra) {
+  const linea = CRONOLOGIA[obra.id];
+  const lista = document.getElementById("cronologia");
+  lista.innerHTML = "";
+  if (!linea) {
+    return;
+  }
+  const hoy = mesesHoy();
+  for (const hito of linea.hitos) {
+    const cumplido = mesesDe(hito.fecha) <= hoy;
+    const item = nodo("li", "hito");
+    item.dataset.estado = cumplido ? "cumplido" : "pendiente";
+    item.innerHTML =
+      '<span class="hito-punto" aria-hidden="true"></span>' +
+      '<span class="hito-fecha">' + etiquetaFecha(hito.fecha) + '</span>' +
+      '<span class="hito-texto">' + escapar(hito.texto) + '</span>' +
+      '<span class="hito-marca">' + (cumplido ? "cumplido" : "previsto") + '</span>';
+    lista.appendChild(item);
+  }
+}
+
+/* ------------------------------------------------------------
+   10. Acciones del panel
+   ------------------------------------------------------------ */
+
+let avisoTemporizador = null;
+
+/** Mensajito de confirmación en la esquina. */
+function avisar(texto, esError) {
+  const aviso = document.getElementById("aviso");
+  aviso.textContent = texto;
+  aviso.classList.toggle("aviso-error", Boolean(esError));
+  aviso.classList.add("visible");
+  if (avisoTemporizador) {
+    clearTimeout(avisoTemporizador);
+  }
+  avisoTemporizador = setTimeout(function () {
+    aviso.classList.remove("visible");
+  }, 3200);
+}
+
+async function copiarTexto(texto) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    return true;
+  } catch (error) {
+    // Sin permiso de portapapeles: se copia con el método viejo.
+    try {
+      const caja = document.createElement("textarea");
+      caja.value = texto;
+      caja.style.position = "fixed";
+      caja.style.opacity = "0";
+      document.body.appendChild(caja);
+      caja.select();
+      const bien = document.execCommand("copy");
+      document.body.removeChild(caja);
+      return bien;
+    } catch (otro) {
+      return false;
+    }
+  }
+}
+
+/** Reporte en texto plano, listo para pegar en un chat de obra. */
+function armarReporte() {
+  if (!datosActuales) {
+    return null;
+  }
+  const obra = obraActual;
+  const m = muestraDeActual(datosActuales);
+  const clima = describirClima(m.codigo, m.esDia, m.precipitacion);
+  const riesgo = calcularRiesgo(m);
+  const ventana = buscarVentana(datosActuales);
+
+  const lineas = [
+    "CLIMA DE OBRA — " + obra.nombre,
+    obra.ciudad + " · hora local " + soloHora(datosActuales.current.time),
+    "",
+    "VEREDICTO: " + riesgo.nivel.sello + " (índice " + riesgo.indice + "/100)",
+    ventana
+      ? "Mejor ventana 24 h: " + ventana.desde + " a " + ventana.hasta +
+        " (índice " + ventana.indice + ")"
+      : "Sin ventana recomendable en las próximas 24 h.",
+    "",
+    "CONDICIONES",
+    "Cielo: " + clima.texto,
+    "Temperatura: " + redondear(m.temp, 1) + " °C (se siente " + redondear(m.aparente, 1) + " °C)",
+    "Humedad: " + redondear(m.humedad, 0) + " %",
+    "Precipitación: " + redondear(m.precipitacion, 1) + " mm",
+    "Viento: " + redondear(m.viento, 0) + " km/h del " + rumboDe(m.direccion) +
+      ", ráfagas " + redondear(m.rafaga, 0) + " km/h",
+    "Índice UV: " + redondear(m.uv, 1) + " (" + categoriaUv(m.uv) + ")",
+    "",
+    "FACTORES EN CONTRA"
+  ];
+  for (const factor of riesgo.factores) {
+    lineas.push("- " + factor.nombre + ": " + factor.lectura);
+  }
+  lineas.push("");
+  lineas.push("Datos de Open-Meteo. El índice es orientativo y no sustituye");
+  lineas.push("el criterio del residente de obra.");
+  return lineas.join("\n");
+}
+
+/** Pronóstico de 24 h y de 7 días en una hoja de cálculo. */
+function armarCsv() {
+  if (!datosActuales) {
+    return null;
+  }
+  const porHora = datosActuales.hourly;
+  const porDia = datosActuales.daily;
+  const inicio = indiceHoraActual(datosActuales);
+  const filas = [];
+
+  filas.push("obra;" + obraActual.nombre);
+  filas.push("ciudad;" + obraActual.ciudad);
+  filas.push("");
+  filas.push("bloque;momento;temperatura_c;sensacion_c;humedad_pct;lluvia_mm;prob_lluvia_pct;viento_kmh;rafaga_kmh;uv;indice_riesgo;veredicto");
+
+  for (let i = inicio; i < Math.min(inicio + 24, porHora.time.length); i++) {
+    const riesgo = calcularRiesgo({
+      aparente: porHora.apparent_temperature[i],
+      humedad: porHora.relative_humidity_2m[i],
+      precipitacion: porHora.precipitation[i],
+      probabilidad: porHora.precipitation_probability[i],
+      viento: porHora.wind_speed_10m[i],
+      rafaga: porHora.wind_gusts_10m[i],
+      uv: porHora.uv_index[i]
+    });
+    filas.push([
+      "hora", porHora.time[i],
+      porHora.temperature_2m[i], porHora.apparent_temperature[i],
+      porHora.relative_humidity_2m[i], porHora.precipitation[i],
+      porHora.precipitation_probability[i], porHora.wind_speed_10m[i],
+      porHora.wind_gusts_10m[i], porHora.uv_index[i],
+      riesgo.indice, riesgo.nivel.sello
+    ].join(";"));
+  }
+
+  for (let i = 0; i < porDia.time.length; i++) {
+    const riesgo = calcularRiesgo({
+      aparente: porDia.temperature_2m_max[i],
+      humedad: 60,
+      precipitacion: porDia.precipitation_sum[i] / 8,
+      probabilidad: porDia.precipitation_probability_max[i],
+      viento: porDia.wind_speed_10m_max[i],
+      rafaga: porDia.wind_speed_10m_max[i],
+      uv: porDia.uv_index_max[i]
+    });
+    filas.push([
+      "dia", porDia.time[i],
+      porDia.temperature_2m_max[i], porDia.temperature_2m_min[i],
+      "", porDia.precipitation_sum[i],
+      porDia.precipitation_probability_max[i], porDia.wind_speed_10m_max[i],
+      "", porDia.uv_index_max[i],
+      riesgo.indice, riesgo.nivel.sello
+    ].join(";"));
+  }
+  return filas.join("\n");
+}
+
+function descargar(nombre, contenido, tipo) {
+  const blob = new Blob(["﻿" + contenido], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
+  setTimeout(function () {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+/* --- Tema manual: automático, claro u oscuro --- */
+
+const TEMAS = ["auto", "claro", "oscuro"];
+const NOMBRES_TEMA = {
+  auto: "automático",
+  claro: "claro",
+  oscuro: "oscuro"
+};
+let temaElegido = "auto";
+
+function leerTemaGuardado() {
+  try {
+    const guardado = localStorage.getItem("clima-obra-tema");
+    if (TEMAS.indexOf(guardado) !== -1) {
+      temaElegido = guardado;
+    }
+  } catch (error) {
+    // Sin almacenamiento disponible: se queda en automático.
+  }
+  aplicarTema();
+}
+
+function aplicarTema() {
+  document.getElementById("accionTema").innerHTML =
+    '<span aria-hidden="true">🌗</span> Tema: ' + NOMBRES_TEMA[temaElegido];
+  if (temaElegido === "claro") {
+    document.body.dataset.momento = "dia";
+  } else if (temaElegido === "oscuro") {
+    document.body.dataset.momento = "noche";
+  } else if (datosActuales) {
+    document.body.dataset.momento =
+      datosActuales.current.is_day === 1 ? "dia" : "noche";
+  }
+}
+
+function girarTema() {
+  temaElegido = TEMAS[(TEMAS.indexOf(temaElegido) + 1) % TEMAS.length];
+  try {
+    localStorage.setItem("clima-obra-tema", temaElegido);
+  } catch (error) {
+    // No se puede recordar, pero el cambio sí se aplica.
+  }
+  aplicarTema();
+  avisar("Tema " + NOMBRES_TEMA[temaElegido] + ".");
+}
+
+function conectarAcciones() {
+  document.getElementById("accionReporte")
+    .addEventListener("click", async function () {
+      const reporte = armarReporte();
+      if (!reporte) {
+        avisar("Todavía no hay datos que reportar.", true);
+        return;
+      }
+      const bien = await copiarTexto(reporte);
+      avisar(
+        bien
+          ? "Reporte copiado: ya lo puedes pegar en el chat de la obra."
+          : "No se pudo copiar el reporte.",
+        !bien
+      );
+    });
+
+  document.getElementById("accionCsv")
+    .addEventListener("click", function () {
+      const csv = armarCsv();
+      if (!csv) {
+        avisar("Todavía no hay datos que descargar.", true);
+        return;
+      }
+      descargar(
+        "clima-obra-" + obraActual.id + ".csv",
+        csv,
+        "text/csv;charset=utf-8;"
+      );
+      avisar("CSV descargado con las 24 horas y los 7 días.");
+    });
+
+  document.getElementById("accionCompartir")
+    .addEventListener("click", async function () {
+      const enlace = location.origin + location.pathname + "?obra=" + obraActual.id;
+      const titulo = "Clima de obra — " + obraActual.nombre;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: titulo, url: enlace });
+          return;
+        } catch (error) {
+          // Si se cancela el diálogo no hay nada que avisar.
+          if (error && error.name === "AbortError") {
+            return;
+          }
+        }
+      }
+      const bien = await copiarTexto(enlace);
+      avisar(bien ? "Enlace copiado." : "No se pudo copiar el enlace.", !bien);
+    });
+
+  document.getElementById("accionMapa")
+    .addEventListener("click", function () {
+      window.open(
+        "https://www.openstreetmap.org/?mlat=" + obraActual.lat +
+        "&mlon=" + obraActual.lon + "#map=15/" + obraActual.lat + "/" + obraActual.lon,
+        "_blank",
+        "noopener"
+      );
+    });
+
+  document.getElementById("accionImprimir")
+    .addEventListener("click", function () {
+      window.print();
+    });
+
+  // En papel conviene que salga todo, también lo que está plegado.
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details.desglose").forEach(function (caja) {
+      caja.dataset.abiertoAntes = caja.open ? "si" : "no";
+      caja.open = true;
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    document.querySelectorAll("details.desglose").forEach(function (caja) {
+      caja.open = caja.dataset.abiertoAntes === "si";
+    });
+  });
+
+  document.getElementById("accionTema")
+    .addEventListener("click", girarTema);
+
+  // El menú se cierra al elegir una acción o al tocar fuera.
+  const menu = document.getElementById("menuAcciones");
+  menu.querySelector(".menu-lista").addEventListener("click", function () {
+    menu.open = false;
+  });
+  document.addEventListener("click", function (evento) {
+    if (menu.open && !menu.contains(evento.target)) {
+      menu.open = false;
+    }
+  });
+
+  document.getElementById("accionPantalla")
+    .addEventListener("click", async function () {
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (error) {
+        avisar("Este navegador no dejó abrir la pantalla completa.", true);
+      }
+    });
+}
+
+/* ------------------------------------------------------------
+   11. Reloj de la obra
    ------------------------------------------------------------ */
 
 function arrancarReloj() {
@@ -1320,7 +1851,7 @@ function dibujarReloj() {
 }
 
 /* ------------------------------------------------------------
-   10. Carga y orquestación
+   12. Carga y orquestación
    ------------------------------------------------------------ */
 
 function marcarEstado(texto) {
@@ -1362,6 +1893,7 @@ async function cargarObra() {
     const ventana = buscarVentana(datos);
 
     pintarVeredicto(riesgo, ventana);
+    pintarKpis(datos, riesgo, obra);
     pintarMetricas(m, clima);
     pintarCompas(m);
     pintarSol(datos);
@@ -1406,6 +1938,8 @@ function seleccionarObra(obra) {
   }
   pintarPortada(obra);
   pintarLamina(obra);
+  pintarCalendario(obra);
+  pintarCronologia(obra);
   pintarListaProyectos();
   actualizarBoton();
   cerrarPanel();
@@ -1458,8 +1992,49 @@ function cerrarPanel() {
 }
 
 /* ------------------------------------------------------------
-   11. Aparición de secciones al hacer scroll
+   13. Aparición de secciones al hacer scroll
    ------------------------------------------------------------ */
+
+/* --- Pestañas --- */
+
+const PESTANAS = ["hoy", "pronostico", "proyecto", "obras"];
+
+function mostrarPestana(nombre) {
+  for (const clave of PESTANAS) {
+    const boton = document.getElementById("tab-" + clave);
+    const panel = document.getElementById("panel-" + clave);
+    const activa = clave === nombre;
+    boton.setAttribute("aria-selected", activa ? "true" : "false");
+    panel.hidden = !activa;
+    if (activa) {
+      // Las secciones ocultas nunca cruzaron la pantalla, así que
+      // el observador de scroll no las reveló: se muestran aquí.
+      panel.querySelectorAll(".revelable").forEach(function (seccion) {
+        seccion.classList.add("visible");
+      });
+    }
+  }
+}
+
+function conectarPestanas() {
+  for (const clave of PESTANAS) {
+    document.getElementById("tab-" + clave)
+      .addEventListener("click", function () {
+        mostrarPestana(clave);
+        try {
+          // Deja la pestaña en la dirección, para poder compartirla.
+          history.replaceState(null, "", "#" + clave);
+        } catch (error) {
+          // En file:// el navegador no deja cambiar la dirección.
+        }
+      });
+  }
+  // Se puede llegar directo a una pestaña: index.html#proyecto
+  const pedida = location.hash.replace("#", "");
+  if (PESTANAS.indexOf(pedida) !== -1) {
+    mostrarPestana(pedida);
+  }
+}
 
 function activarRevelado() {
   const secciones = document.querySelectorAll(".revelable");
@@ -1482,7 +2057,7 @@ function activarRevelado() {
 }
 
 /* ------------------------------------------------------------
-   12. Eventos
+   14. Eventos
    ------------------------------------------------------------ */
 
 document.getElementById("btnProyecto").addEventListener("click", function () {
@@ -1509,8 +2084,11 @@ document.addEventListener("keydown", function (evento) {
   } else if (evento.key === "r" || evento.key === "R") {
     cargarObra();
     pintarFlota();
+  } else if (evento.key >= "1" && evento.key <= "4") {
+    mostrarPestana(PESTANAS[Number(evento.key) - 1]);
   } else if (evento.key === "Escape") {
     cerrarPanel();
+    document.getElementById("menuAcciones").open = false;
   }
 });
 
@@ -1520,11 +2098,16 @@ setInterval(function () {
 }, 10 * 60 * 1000);
 
 /* ------------------------------------------------------------
-   13. Arranque
+   15. Arranque
    ------------------------------------------------------------ */
 
 pintarPortada(obraActual);
 pintarLamina(obraActual);
+pintarCalendario(obraActual);
+pintarCronologia(obraActual);
+conectarAcciones();
+conectarPestanas();
+leerTemaGuardado();
 pintarListaProyectos();
 actualizarBoton();
 activarRevelado();
