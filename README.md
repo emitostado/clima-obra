@@ -1,7 +1,14 @@
 # Clima-obra
 
 ## ¿Qué hace la página?
-La página es un panel de clima para obras de construcción. Para la obra que elijas muestra:
+La página es un panel de clima para obras de construcción. Arriba y siempre a la vista queda lo único que hay que decidir: **qué obra es y si se puede colar**, con el índice de riesgo y la mejor ventana del día. Todo lo demás está repartido en cuatro pestañas para no saturar:
+
+- **Hoy** — las condiciones en sitio, la rosa de los vientos y el arco solar.
+- **Pronóstico** — las próximas 24 horas y los 7 días.
+- **Proyecto** — de qué obra se trata, su avance, el centro de datos y la ficha técnica.
+- **Obras** — las siete obras comparadas, de menor a mayor riesgo.
+
+Para la obra que elijas muestra:
 
 - Las **condiciones actuales**: temperatura y sensación térmica, humedad, punto de rocío, precipitación, viento, ráfagas, nubosidad, índice UV y presión.
 - Un **índice de riesgo de colado** del 0 al 100, con el veredicto (apto, apto con vigilancia, precaución o suspender) y el desglose de qué factor pesa más.
@@ -10,6 +17,22 @@ La página es un panel de clima para obras de construcción. Para la obra que el
 - La **rosa de los vientos** y el **arco solar** con las horas de luz que quedan en el sitio.
 - Una **comparativa de todas las obras** ordenadas de menor a mayor riesgo.
 - La **ficha técnica** de la obra con sus fuentes.
+
+Y un **centro de datos** para seguir el proyecto:
+
+- Cinco cifras de la semana: días aptos para colar de 7, horas aptas de 24, lluvia acumulada, meses que faltan para la meta y el riesgo de ahora.
+- Un **calendario de la obra** que compara cuánto del plazo lleva corrido contra el avance reportado, y dice si va por delante o por detrás.
+- La **cronología** con los hitos publicados de cada proyecto, marcando los cumplidos.
+
+## Acciones
+
+- **Copiar reporte** — deja en el portapapeles un resumen en texto listo para pegar en el chat de la obra.
+- **Descargar CSV** — las 24 horas y los 7 días con su índice de riesgo, para abrirlo en Excel.
+- **Compartir** — usa el menú del sistema si existe; si no, copia el enlace de la obra.
+- **Ver en el mapa** — abre las coordenadas del sitio en OpenStreetMap.
+- **Imprimir** — hoja limpia en blanco y negro, sin fondo ni botones.
+- **Tema** — automático, claro u oscuro; la elección se recuerda.
+- **Pantalla completa** — para dejar el panel en una pantalla de obra.
 
 El panel va en dos columnas: a la izquierda toda la información y a la derecha la obra dibujada, que se queda fija mientras bajas. Las ilustraciones son propias, hechas en SVG, y toman el color del tema: de noche se les encienden las ventanas. Además la silueta de la obra vuela por el fondo, muy tenue, junto con el clima.
 
@@ -50,7 +73,9 @@ Hay que descargar o clonar los archivos y abrir `index.html` en un navegador. Se
 - `app.js` — la consulta a la API, el cálculo del riesgo y el pintado del panel.
 
 ## Atajos
-`←` `→` cambiar de obra · `R` actualizar · `Esc` cerrar el panel de obras.
+`←` `→` cambiar de obra · `1`–`4` cambiar de pestaña · `R` actualizar · `Esc` cerrar los paneles.
+
+También se puede llegar directo a una pestaña: `?obra=jeddah-tower#proyecto`.
 
 ## Aviso
 El índice de riesgo es una heurística propia que pondera lluvia, viento, temperatura, humedad y radiación UV. Es orientativo y no sustituye el criterio del residente de obra ni la norma del proyecto.

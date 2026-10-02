@@ -207,8 +207,8 @@ const OBRAS = [
     resumen:
       "La estación de alta velocidad más grande que se construye en el Reino Unido. Dos tuneladoras, Madeleine y Karen, avanzan desde aquí hacia Euston a hasta 150 m por semana.",
     cifras: [
-      { valor: "6", unidad: "andenes", etiqueta: "De 450 m cada uno" },
-      { valor: "2", unidad: "tuneladoras", etiqueta: "Madeleine y Karen" },
+      { valor: "6", unidad: "andenes", etiqueta: "Andenes de 450 m" },
+      { valor: "2", unidad: "tuneladoras", etiqueta: "Tuneladoras activas" },
       { valor: "150", unidad: "m/semana", etiqueta: "Ritmo de tunelación" },
       { valor: "2027", unidad: "", etiqueta: "Llegada a Euston" }
     ],
@@ -321,3 +321,92 @@ const OBRAS = [
     ]
   }
 ];
+
+/* ============================================================
+   CRONOLOGÍA — para seguir cada proyecto en el tiempo
+
+   "desde" y "hasta" son las fechas de inicio y de meta, en
+   formato AAAA-MM, para poder calcular cuánto del calendario
+   lleva corrido la obra. Son aproximadas: muchos proyectos solo
+   publican el año.
+
+   Los hitos son hechos publicados, los mismos que respaldan las
+   fuentes de cada obra.
+   ============================================================ */
+
+const CRONOLOGIA = {
+  "torre-rise": {
+    desde: "2021-01",
+    hasta: "2027-01",
+    hitos: [
+      { fecha: "2021-01", texto: "Arranca la construcción en Valle Oriente." },
+      { fecha: "2026-05", texto: "80 losas construidas y más de 315 m de altura." },
+      { fecha: "2026-09", texto: "Supera los 400 m, con 96 losas y muro cortina en más de 30 niveles." },
+      { fecha: "2027-01", texto: "Meta de conclusión: entre finales de 2026 y principios de 2027." }
+    ]
+  },
+  "tren-mexico-queretaro": {
+    desde: "2025-01",
+    hasta: "2027-12",
+    hitos: [
+      { fecha: "2025-01", texto: "Arrancan los trabajos del corredor." },
+      { fecha: "2026-09", texto: "30.3 % de avance, con 14 frentes activos y 18,200 trabajadores." },
+      { fecha: "2027-12", texto: "Apertura prevista de los primeros tramos." }
+    ]
+  },
+  "metro-bogota-l1": {
+    desde: "2020-10",
+    hasta: "2028-12",
+    hitos: [
+      { fecha: "2020-10", texto: "Inicio de la construcción de la Línea 1." },
+      { fecha: "2026-04", texto: "77.53 % de avance de obra." },
+      { fecha: "2026-06", texto: "80.37 % y arrancan las pruebas dinámicas de trenes sobre el viaducto." },
+      { fecha: "2026-07", texto: "81.25 % de avance." },
+      { fecha: "2026-08", texto: "82.33 % de avance y 18 km de viaducto construidos." },
+      { fecha: "2028-12", texto: "Operación comercial prevista." }
+    ]
+  },
+  "jeddah-tower": {
+    desde: "2013-04",
+    hasta: "2028-08",
+    hitos: [
+      { fecha: "2013-04", texto: "Inicio de la obra." },
+      { fecha: "2026-04", texto: "Alcanza los 100 pisos y confirma que superará los 1,000 m." },
+      { fecha: "2026-08", texto: "430 m de altura y 107 pisos terminados." },
+      { fecha: "2028-08", texto: "Meta de conclusión: será el primer edificio de más de 1 km." }
+    ]
+  },
+  "hs2-old-oak-common": {
+    desde: "2021-01",
+    hasta: "2027-12",
+    hitos: [
+      { fecha: "2021-01", texto: "Inicio de la obra de la estación." },
+      { fecha: "2026-01", texto: "Arranca la tuneladora Madeleine rumbo a Euston." },
+      { fecha: "2026-03", texto: "Arranca la tuneladora Karen; ambas avanzan hasta 150 m por semana." },
+      { fecha: "2026-08", texto: "Quedan terminados los 6 andenes de alta velocidad de 450 m." },
+      { fecha: "2026-12", texto: "Fase final del túnel de Old Oak Common." },
+      { fecha: "2027-12", texto: "Llegada prevista de las tuneladoras a Euston." }
+    ]
+  },
+  "sydney-metro-west": {
+    desde: "2020-01",
+    hasta: "2032-12",
+    hitos: [
+      { fecha: "2020-01", texto: "Inicio de la obra." },
+      { fecha: "2026-03", texto: "La última tuneladora rompe en la caverna de Hunter Street: tunelación completa." },
+      { fecha: "2026-12", texto: "Termina la excavación mayor de las estaciones." },
+      { fecha: "2032-12", texto: "Apertura prevista de la línea." }
+    ]
+  },
+  "hinkley-point-c": {
+    desde: "2017-01",
+    hasta: "2030-12",
+    hitos: [
+      { fecha: "2017-01", texto: "Inicio de la obra." },
+      { fecha: "2026-05", texto: "Pico de construcción: alrededor de 14,000 personas en sitio." },
+      { fecha: "2026-06", texto: "La grúa Big Carl iza el segundo reactor a su posición." },
+      { fecha: "2026-12", texto: "Casi todos los edificios quedan terminados." },
+      { fecha: "2030-12", texto: "Primera generación eléctrica de la Unidad 1." }
+    ]
+  }
+};

@@ -9,6 +9,7 @@
      5. Pronósticos, viento, sol y comparativa
      6. Responsivo
      7. Escenas de clima (partículas del fondo)
+     8. Impresión
    ============================================================ */
 
 /* ------------------------------------------------------------
@@ -139,11 +140,16 @@ body {
   min-height: 100vh;
 }
 
-header,
 main,
 footer {
   position: relative;
   z-index: 1;
+}
+/* La cabecera va por encima: de ella cuelgan el menú de acciones
+   y el panel de obras, que se despliegan sobre el contenido. */
+header {
+  position: relative;
+  z-index: 20;
 }
 
 h1, h2, h3 {
@@ -190,27 +196,14 @@ a {
   margin-bottom: 20px;
   border-radius: 20px;
   color: #fff;
+  /* El brillo diagonal va en el propio fondo y no en un
+     pseudo-elemento, para no necesitar overflow: hidden, que
+     recortaría el menú de acciones al desplegarse. */
   background:
+    linear-gradient(104deg, transparent 52%, rgba(255, 255, 255, 0.1) 62%, transparent 82%),
     linear-gradient(135deg, rgba(2, 132, 199, 0.35), transparent 60%),
     linear-gradient(135deg, #0b1526, #1e3a5f);
   box-shadow: var(--sombra-alta);
-  overflow: hidden;
-}
-.cabecera::after {
-  /* Brillo diagonal sutil */
-  content: "";
-  position: absolute;
-  top: -60%;
-  right: -10%;
-  width: 55%;
-  height: 220%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.09),
-    transparent
-  );
-  transform: rotate(18deg);
-  pointer-events: none;
 }
 .cabecera-fila {
   display: flex;
@@ -223,6 +216,10 @@ a {
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
+}
+.marca p {
+  overflow-wrap: break-word;
 }
 .marca-icono {
   display: grid;
@@ -281,6 +278,9 @@ a {
   cursor: pointer;
   transition: 0.2s;
   text-align: left;
+  /* Sin esto el botón no puede encogerse y revienta la cabecera
+     en pantallas estrechas en lugar de pasar a otra línea. */
+  min-width: 0;
 }
 .btn-proyecto:hover {
   background: rgba(255, 255, 255, 0.2);
@@ -289,9 +289,13 @@ a {
 .btn-proyecto-texto {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .btn-proyecto-texto strong {
   font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .btn-proyecto-texto small {
   font-size: 10.5px;
@@ -329,6 +333,103 @@ body.cargando .btn-icono-glifo {
   animation: girar 1s linear infinite;
 }
 
+/* --- Menú de acciones --- */
+.menu-acciones {
+  position: relative;
+}
+.menu-acciones > summary {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  list-style: none;
+  transition: 0.2s;
+}
+.menu-acciones > summary::-webkit-details-marker {
+  display: none;
+}
+.menu-acciones > summary:hover,
+.menu-acciones[open] > summary {
+  background: rgba(255, 255, 255, 0.2);
+}
+.menu-lista {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: 4px;
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 13px;
+  background: #0f1d31;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+  animation: aparecer 0.18s ease;
+  /* Que nunca se salga de la pantalla en móvil. */
+  max-width: calc(100vw - 32px);
+}
+.accion {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: none;
+  color: #e8f0fa;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.accion:hover {
+  background: rgba(14, 165, 233, 0.32);
+  border-color: #38bdf8;
+}
+.accion span {
+  font-size: 15px;
+}
+
+/* --- Avisos de las acciones --- */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  max-width: min(440px, 90vw);
+  padding: 13px 20px;
+  border-radius: 12px;
+  background: #0f1f33;
+  border: 1px solid #38bdf8;
+  color: #e8f0fa;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, 24px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.aviso.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.aviso-error {
+  border-color: #f87171;
+}
+
 /* --- Panel de proyectos --- */
 .panel-proyectos {
   display: none;
@@ -344,7 +445,8 @@ body.cargando .btn-icono-glifo {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   margin: 0 0 14px;
   font-size: 14px;
   color: #cbd9e8;
@@ -514,12 +616,6 @@ body.cargando .btn-icono-glifo {
   display: block;
   margin-top: 2px;
   font-size: 11.5px;
-  color: var(--texto-suave);
-}
-.lamina-nota {
-  margin: 11px 2px 13px;
-  font-size: 11px;
-  line-height: 1.5;
   color: var(--texto-suave);
 }
 .lamina-datos {
@@ -699,25 +795,111 @@ body[data-momento="noche"] .il-luz {
   color: var(--texto-medio);
 }
 
-/* --- Portada de la obra --- */
-.portada-encabezado {
+/* --- Pestañas --- */
+.pestanas {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--superficie);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra);
+  overflow-x: auto;
+}
+.pestana {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 14px;
+  white-space: nowrap;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--texto-medio);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.18s;
+}
+.pestana:hover {
+  background: var(--superficie-3);
+  color: var(--texto);
+}
+.pestana[aria-selected="true"] {
+  background: var(--acento);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+body[data-momento="noche"] .pestana[aria-selected="true"] {
+  color: #06202f;
+}
+.pestana span {
+  font-size: 15px;
+}
+
+/* --- Resumen fijo: obra + veredicto --- */
+.resumen-encabezado {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 18px;
+  gap: 16px;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
-.portada h2 {
+.resumen-nombre {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 30px;
-  margin: 4px 0 6px;
+  font-size: 28px;
+  margin: 4px 0 5px;
 }
-.portada-lugar {
+.resumen-lugar {
   margin: 0;
   color: var(--texto-medio);
-  font-size: 14px;
+  font-size: 13.5px;
+}
+
+/* --- Desplegables: lo secundario empieza cerrado --- */
+.desglose {
+  margin-top: 14px;
+}
+.desglose > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 9px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  color: var(--texto-medio);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  transition: 0.18s;
+}
+.desglose > summary::-webkit-details-marker {
+  display: none;
+}
+.desglose > summary::before {
+  content: "▸";
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+.desglose[open] > summary::before {
+  transform: rotate(90deg);
+}
+.desglose > summary:hover {
+  border-color: var(--acento-claro);
+  color: var(--texto);
+}
+.desglose[open] > summary {
+  margin-bottom: 14px;
 }
 .separador {
   margin: 0 6px;
@@ -756,7 +938,7 @@ body[data-momento="noche"] .il-luz {
 }
 .flota-bandera {
   font-size: 12px;
-  justify-self: start;
+  align-self: flex-start;
 }
 
 .chip {
@@ -870,6 +1052,224 @@ body[data-momento="noche"] .il-luz {
   color: var(--texto-suave);
 }
 
+/* --- Centro de datos --- */
+.subtitulo {
+  margin: 24px 0 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--texto-suave);
+}
+.tablero-kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.kpi {
+  position: relative;
+  padding: 17px 16px;
+  border-radius: 14px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.kpi:hover {
+  transform: translateY(-3px);
+}
+.kpi-icono {
+  position: absolute;
+  top: 12px;
+  right: 13px;
+  font-size: 20px;
+  opacity: 0.55;
+}
+.kpi-valor {
+  display: block;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--nivel-fg, var(--neutro-fg));
+  font-variant-numeric: tabular-nums;
+}
+.kpi-valor em {
+  margin-left: 4px;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  opacity: 0.75;
+}
+.kpi-etiqueta {
+  display: block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--texto);
+}
+.kpi-detalle {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--texto-medio);
+}
+
+/* --- Calendario de la obra --- */
+.calendario {
+  margin-top: 18px;
+  padding: 17px 18px;
+  border-radius: 13px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.calendario-cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--texto-medio);
+}
+.calendario-cabeza strong {
+  padding: 5px 12px;
+  border-radius: 18px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+  color: var(--nivel-fg, var(--neutro-fg));
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.calendario-pista {
+  position: relative;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--superficie-3);
+  border: 1px solid var(--borde);
+  overflow: hidden;
+}
+.calendario-tiempo,
+.calendario-avance {
+  position: absolute;
+  left: 0;
+  height: 50%;
+  width: 0;
+  transition: width 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.calendario-tiempo {
+  top: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--borde-fuerte) 0 6px,
+    transparent 6px 12px
+  );
+  border-bottom: 1px solid var(--borde);
+}
+.calendario-avance {
+  bottom: 0;
+  background: linear-gradient(90deg, #0284c7, #22d3ee, #34d399);
+}
+.calendario-hoy {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  display: flex;
+  align-items: flex-start;
+  padding-left: 5px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--texto-medio);
+  pointer-events: none;
+  transition: left 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.calendario-hoy i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--texto);
+  opacity: 0.6;
+}
+.calendario-pies {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--texto-suave);
+}
+
+/* --- Cronología --- */
+.cronologia {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 26px;
+}
+.cronologia::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--borde-fuerte);
+}
+.hito {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr 84px;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 14px;
+  margin-bottom: 8px;
+  border-radius: 11px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.hito-punto {
+  position: absolute;
+  left: -24px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--superficie-2);
+  background: var(--borde-fuerte);
+}
+.hito[data-estado="cumplido"] .hito-punto {
+  background: #22c55e;
+}
+.hito[data-estado="cumplido"] {
+  border-color: var(--optimo-bd);
+}
+.hito-fecha {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--acento);
+  font-variant-numeric: tabular-nums;
+}
+.hito-texto {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto-medio);
+}
+.hito-marca {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  text-align: right;
+  color: var(--texto-suave);
+}
+.hito[data-estado="cumplido"] .hito-marca {
+  color: var(--optimo-fg);
+  font-weight: 700;
+}
+
 /* --- Veredicto --- */
 .sello {
   padding: 9px 16px;
@@ -886,7 +1286,7 @@ body[data-momento="noche"] .il-luz {
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 26px;
-  align-items: center;
+  align-items: start;
 }
 .medidor {
   position: relative;
@@ -1548,6 +1948,13 @@ kbd {
    6. Responsivo
    ------------------------------------------------------------ */
 
+.panel {
+  display: grid;
+}
+.panel[hidden] {
+  display: none;
+}
+
 /* Debajo de 1180 px la columna de la obra ya no cabe al lado:
    pasa arriba del todo, como portada del panel. */
 @media (max-width: 1180px) {
@@ -1559,13 +1966,10 @@ kbd {
     order: 0;
   }
   .lamina-caja {
-    margin-bottom: 18px;
-  }
-  .lamina-dibujo svg {
-    height: 210px;
-  }
-  .lamina-datos {
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    /* Arriba del todo, la lámina se centra en vez de estirarse
+       a lo ancho y dejar la ilustración perdida en el centro. */
+    max-width: 440px;
+    margin: 0 auto 18px;
   }
 }
 
@@ -1598,11 +2002,22 @@ kbd {
   .cabecera-acciones {
     flex-wrap: wrap;
   }
-  .btn-proyecto {
-    flex: 1;
-  }
+  /* El reloj y los dos iconos comparten una línea; el selector de
+     obra se lleva la siguiente entera. */
   .reloj {
+    order: 1;
+    flex: 1 1 auto;
     text-align: left;
+  }
+  .menu-acciones {
+    order: 2;
+  }
+  #actualizar {
+    order: 3;
+  }
+  .btn-proyecto {
+    order: 4;
+    flex: 1 1 100%;
   }
   .tarjeta {
     padding: 18px;
@@ -1636,6 +2051,20 @@ kbd {
   }
   .sol-datos {
     grid-template-columns: 1fr;
+  }
+  .lamina-datos {
+    grid-template-columns: 1fr;
+  }
+  .hito {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .hito-marca {
+    text-align: left;
+  }
+  .calendario-cabeza {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -1698,7 +2127,9 @@ body[data-momento="noche"][data-clima="niebla"] {
   left: 0;
   width: 190px;
   height: 250px;
-  opacity: 0.16;
+  /* Van cerca del color del fondo: se notan, pero no bajan el
+     contraste del texto que queda encima de las tarjetas. */
+  opacity: 0.4;
   animation-name: derivar;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -1717,10 +2148,10 @@ body[data-momento="noche"][data-clima="niebla"] {
   filter: none;
 }
 :root {
-  --silueta-fondo: #7d94ad;
+  --silueta-fondo: #a9bbcd;
 }
 body[data-momento="noche"] {
-  --silueta-fondo: #cbd5e1;
+  --silueta-fondo: #38485f;
 }
 
 /* --- Nubes --- */
@@ -2023,6 +2454,129 @@ body[data-momento="noche"] {
 @keyframes latir-suave {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 0.8; }
+}
+
+/* ------------------------------------------------------------
+   8. Impresión
+   Se quita el fondo animado y la interfaz que no sirve en papel,
+   y se deja el reporte legible en blanco y negro.
+   ------------------------------------------------------------ */
+
+@media print {
+  /* Si la obra está en tema nocturno, sus colores son claros y
+     sobre papel blanco no se leerían: en papel siempre tinta
+     oscura sobre fondo blanco, venga del tema que venga. */
+  body[data-momento="dia"],
+  body[data-momento="noche"] {
+    --texto: #000000;
+    --texto-medio: #222222;
+    --texto-suave: #555555;
+    --acento: #0b3c5d;
+    --acento-claro: #0b3c5d;
+    --acento-fondo: #ffffff;
+    --superficie: #ffffff;
+    --superficie-2: #ffffff;
+    --superficie-3: #f1f1f1;
+    --borde: #bbbbbb;
+    --borde-fuerte: #888888;
+    --optimo-fg: #15803d;
+    --optimo-bg: #ffffff;
+    --optimo-bd: #999999;
+    --aceptable-fg: #0b3c5d;
+    --aceptable-bg: #ffffff;
+    --aceptable-bd: #999999;
+    --precaucion-fg: #92400e;
+    --precaucion-bg: #ffffff;
+    --precaucion-bd: #999999;
+    --critico-fg: #991b1b;
+    --critico-bg: #ffffff;
+    --critico-bd: #999999;
+    --neutro-fg: #333333;
+    --neutro-bg: #ffffff;
+    --neutro-bd: #999999;
+    --sombra: none;
+    --sombra-alta: none;
+    /* La ilustración también pasa a tonos de papel. */
+    --cielo-a: #ffffff;
+    --cielo-b: #ffffff;
+    --il-1: #6b7a8c;
+    --il-2: #3f4b5a;
+    --il-3: #c3ccd6;
+    --il-luz: #e8e2c8;
+    --il-acento: #5a6b7d;
+    --il-suelo: #9aa5b1;
+    --il-corte: #eceff2;
+    --il-tunel: #cdd5dd;
+    --silueta-fondo: #ffffff;
+  }
+
+  #escena,
+  .menu-acciones,
+  .panel-proyectos,
+  .pestanas,
+  .btn-proyecto,
+  .btn-icono,
+  .aviso,
+  #flota,
+  .salto {
+    display: none !important;
+  }
+  /* En papel se imprime todo, no solo la pestaña abierta. */
+  .panel[hidden] {
+    display: block !important;
+  }
+  .desglose > summary {
+    display: none;
+  }
+  body {
+    max-width: none;
+    padding: 0;
+    background: #fff !important;
+    color: #000;
+  }
+  .tablero {
+    grid-template-columns: 1fr;
+  }
+  .columna-visual {
+    position: static;
+    order: 0;
+  }
+  .lamina-caja {
+    /* En papel la ilustración se queda pequeña: no vale una hoja. */
+    max-width: 260px;
+    margin: 0 0 14px;
+  }
+  .cabecera {
+    background: #fff !important;
+    color: #000;
+    box-shadow: none;
+    border: 1px solid #999;
+  }
+  .cabecera p,
+  .reloj span {
+    color: #333;
+  }
+  .reloj {
+    background: none;
+    border-color: #999;
+  }
+  .tarjeta,
+  .lamina-caja {
+    background: #fff !important;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: 1px solid #bbb;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .revelable {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .tira {
+    overflow: visible;
+    flex-wrap: wrap;
+  }
 }
 
 /* Quien prefiere menos movimiento se queda con el color de fondo. */
