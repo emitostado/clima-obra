@@ -11,6 +11,22 @@ La página es un panel de clima para obras de construcción. Para la obra que el
 - Una **comparativa de todas las obras** ordenadas de menor a mayor riesgo.
 - La **ficha técnica** de la obra con sus fuentes.
 
+Y un **centro de datos** para seguir el proyecto:
+
+- Cinco cifras de la semana: días aptos para colar de 7, horas aptas de 24, lluvia acumulada, meses que faltan para la meta y el riesgo de ahora.
+- Un **calendario de la obra** que compara cuánto del plazo lleva corrido contra el avance reportado, y dice si va por delante o por detrás.
+- La **cronología** con los hitos publicados de cada proyecto, marcando los cumplidos.
+
+## Acciones
+
+- **Copiar reporte** — deja en el portapapeles un resumen en texto listo para pegar en el chat de la obra.
+- **Descargar CSV** — las 24 horas y los 7 días con su índice de riesgo, para abrirlo en Excel.
+- **Compartir** — usa el menú del sistema si existe; si no, copia el enlace de la obra.
+- **Ver en el mapa** — abre las coordenadas del sitio en OpenStreetMap.
+- **Imprimir** — hoja limpia en blanco y negro, sin fondo ni botones.
+- **Tema** — automático, claro u oscuro; la elección se recuerda.
+- **Pantalla completa** — para dejar el panel en una pantalla de obra.
+
 El panel va en dos columnas: a la izquierda toda la información y a la derecha la obra dibujada, que se queda fija mientras bajas. Las ilustraciones son propias, hechas en SVG, y toman el color del tema: de noche se les encienden las ventanas. Además la silueta de la obra vuela por el fondo, muy tenue, junto con el clima.
 
 El fondo cambia según el clima real del sitio: llueve con gotas inclinadas por el viento que de verdad sopla, caen rayos en las tormentas, el sol gira sus rayos, hay nubes, niebla, nieve o estrellas. Cuando en la obra ya es de noche, todo el panel pasa a tema oscuro.

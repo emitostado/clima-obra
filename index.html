@@ -47,6 +47,30 @@
       </div>
     </div>
 
+    <div class="acciones" role="group" aria-label="Acciones del panel">
+      <button type="button" class="accion" id="accionReporte">
+        <span aria-hidden="true">📋</span> Copiar reporte
+      </button>
+      <button type="button" class="accion" id="accionCsv">
+        <span aria-hidden="true">⬇️</span> Descargar CSV
+      </button>
+      <button type="button" class="accion" id="accionCompartir">
+        <span aria-hidden="true">🔗</span> Compartir
+      </button>
+      <button type="button" class="accion" id="accionMapa">
+        <span aria-hidden="true">📍</span> Ver en el mapa
+      </button>
+      <button type="button" class="accion" id="accionImprimir">
+        <span aria-hidden="true">🖨️</span> Imprimir
+      </button>
+      <button type="button" class="accion" id="accionTema" aria-live="polite">
+        <span aria-hidden="true">🌗</span> Tema: automático
+      </button>
+      <button type="button" class="accion" id="accionPantalla">
+        <span aria-hidden="true">⛶</span> Pantalla completa
+      </button>
+    </div>
+
     <div id="panelProyectos" class="panel-proyectos">
       <h2 class="panel-titulo">
         Obras monitoreadas
@@ -113,6 +137,39 @@
       </div>
 
       <div class="cifras" id="obraCifras"></div>
+    </section>
+
+    <!-- ===== Centro de datos ===== -->
+    <section id="centro" class="tarjeta revelable">
+      <div class="titulo-seccion">
+        <div>
+          <span class="etiqueta">CENTRO DE DATOS</span>
+          <h2>Seguimiento del proyecto</h2>
+        </div>
+        <span class="leyenda" id="centroSello"></span>
+      </div>
+
+      <div class="tablero-kpi" id="tableroKpi"></div>
+
+      <div class="calendario">
+        <div class="calendario-cabeza">
+          <span>Calendario de la obra</span>
+          <strong id="calendarioVeredicto">—</strong>
+        </div>
+        <div class="calendario-pista" id="calendarioPista">
+          <div class="calendario-tiempo" id="calendarioTiempo"></div>
+          <div class="calendario-avance" id="calendarioAvance"></div>
+          <span class="calendario-hoy" id="calendarioHoy"><i></i>hoy</span>
+        </div>
+        <div class="calendario-pies">
+          <span id="calendarioDesde">—</span>
+          <span id="calendarioHasta">—</span>
+        </div>
+        <p class="nota" id="calendarioNota"></p>
+      </div>
+
+      <h3 class="subtitulo">Cronología de la obra</h3>
+      <ol class="cronologia" id="cronologia"></ol>
     </section>
 
     <!-- ===== Veredicto de colado ===== -->
@@ -249,6 +306,8 @@
       El panel pasa a tema oscuro cuando en el sitio ya es de noche.
     </p>
   </footer>
+
+  <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
 
   <script src="datos.js"></script>
   <script src="siluetas.js"></script>
