@@ -4,10 +4,11 @@
    Índice:
      1. Tokens de color (tema día y tema noche automático)
      2. Base y cabecera
-     3. Componentes (tarjetas, chips, medidor, métricas…)
-     4. Pronósticos, viento, sol y comparativa
-     5. Responsivo
-     6. Escenas de clima (partículas del fondo)
+     3. Tablero de dos columnas e ilustraciones
+     4. Componentes (tarjetas, chips, medidor, métricas…)
+     5. Pronósticos, viento, sol y comparativa
+     6. Responsivo
+     7. Escenas de clima (partículas del fondo)
    ============================================================ */
 
 /* ------------------------------------------------------------
@@ -127,7 +128,7 @@ body[data-momento="noche"] {
 
 body {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  max-width: 1080px;
+  max-width: 1360px;
   margin: 0 auto;
   padding: 26px 20px 60px;
   color: var(--texto);
@@ -410,7 +411,217 @@ body.cargando .btn-icono-glifo {
 }
 
 /* ------------------------------------------------------------
-   3. Tarjetas y componentes
+   3. Tablero de dos columnas
+   La información va a la izquierda y la obra dibujada a la
+   derecha, donde se queda fija mientras se baja por el panel.
+   ------------------------------------------------------------ */
+
+.tablero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 18px;
+  align-items: start;
+}
+.columna-info {
+  min-width: 0;
+}
+.columna-visual {
+  position: sticky;
+  top: 18px;
+  order: 2;
+}
+
+.lamina-caja {
+  background: var(--superficie);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 16px;
+  box-shadow: var(--sombra);
+  transition: background 0.5s ease, border-color 0.5s ease;
+}
+.lamina {
+  position: relative;
+  margin: 0;
+  border-radius: 13px;
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  background: var(--superficie-2);
+}
+.lamina-cielo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--cielo-a) 0%,
+    var(--cielo-b) 72%,
+    var(--cielo-b) 100%
+  );
+  transition: background 0.9s ease;
+}
+.lamina-dibujo {
+  position: relative;
+  display: block;
+  padding: 0;
+}
+.lamina-dibujo svg {
+  /* El lienzo mide 280 x 260, así que la altura sale sola y el
+     dibujo llena la lámina de lado a lado. */
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 280 / 260;
+}
+.lamina-indice {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 2px solid var(--nivel-bd, var(--neutro-bd));
+  color: var(--nivel-fg, var(--neutro-fg));
+  backdrop-filter: blur(6px);
+  transition: 0.5s;
+}
+.lamina-indice strong {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.lamina-indice small {
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  opacity: 0.85;
+}
+.lamina figcaption {
+  position: relative;
+  padding: 12px 15px 14px;
+  background: var(--superficie-3);
+  border-top: 1px solid var(--borde);
+}
+.lamina figcaption strong {
+  display: block;
+  font-size: 15px;
+  color: var(--texto);
+}
+.lamina figcaption span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--texto-suave);
+}
+.lamina-nota {
+  margin: 11px 2px 13px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+.lamina-datos {
+  margin: 0;
+  display: grid;
+  gap: 7px;
+}
+.lamina-datos > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.lamina-datos dt {
+  font-size: 11px;
+  color: var(--texto-suave);
+}
+.lamina-datos dd {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--texto);
+  text-align: right;
+}
+
+/* --- Colores de la ilustración --- */
+:root {
+  --cielo-a: #cfe8fb;
+  --cielo-b: #eaf4fd;
+  --il-1: #5b7a9e;
+  --il-2: #3f5a78;
+  --il-3: #8aa4c0;
+  --il-luz: #fef3c7;
+  --il-acento: #0ea5e9;
+  --il-suelo: #8da4bd;
+  --il-corte: #d7e2ee;
+  --il-tunel: #b9cbdd;
+}
+body[data-momento="noche"] {
+  --cielo-a: #101c31;
+  --cielo-b: #22344d;
+  --il-1: #3a4d66;
+  --il-2: #28374a;
+  --il-3: #2f4257;
+  --il-luz: #fcd34d;
+  --il-acento: #38bdf8;
+  --il-suelo: #1d2a3b;
+  --il-corte: #1a2636;
+  --il-tunel: #31455c;
+}
+body[data-clima="tormenta"],
+body[data-clima="lluvia"] {
+  --cielo-a: #93aac1;
+  --cielo-b: #cfdae6;
+}
+body[data-clima="sol"] {
+  --cielo-a: #bfe3fb;
+  --cielo-b: #fdf4d8;
+}
+body[data-clima="niebla"] {
+  --cielo-a: #c9d3dc;
+  --cielo-b: #e5eaee;
+}
+
+.il-cuerpo { fill: var(--il-1); }
+.il-sombra { fill: var(--il-2); }
+.il-lejano { fill: var(--il-3); opacity: 0.78; }
+.il-ala { fill: var(--il-2); opacity: 0.85; }
+.il-luz {
+  fill: var(--il-luz);
+  opacity: 0.85;
+}
+.il-acento { fill: var(--il-acento); }
+.il-suelo { fill: var(--il-suelo); }
+.il-corte { fill: var(--il-corte); }
+.il-tunel { fill: var(--il-tunel); }
+.il-tunel-int { fill: var(--il-2); }
+.il-linea {
+  fill: none;
+  stroke: var(--il-2);
+  stroke-width: 2;
+  opacity: 0.6;
+}
+.il-grua {
+  fill: none;
+  stroke: var(--il-acento);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+/* De noche las ventanas encendidas brillan un poco. */
+body[data-momento="noche"] .il-luz {
+  opacity: 1;
+  filter: drop-shadow(0 0 3px rgba(252, 211, 77, 0.75));
+}
+
+/* ------------------------------------------------------------
+   4. Tarjetas y componentes
    ------------------------------------------------------------ */
 
 .tarjeta {
@@ -873,7 +1084,7 @@ body.cargando .btn-icono-glifo {
 }
 
 /* ------------------------------------------------------------
-   4. Viento, sol, pronósticos y comparativa
+   5. Viento, sol, pronósticos y comparativa
    ------------------------------------------------------------ */
 
 .dupla {
@@ -1334,8 +1545,29 @@ kbd {
 }
 
 /* ------------------------------------------------------------
-   5. Responsivo
+   6. Responsivo
    ------------------------------------------------------------ */
+
+/* Debajo de 1180 px la columna de la obra ya no cabe al lado:
+   pasa arriba del todo, como portada del panel. */
+@media (max-width: 1180px) {
+  .tablero {
+    grid-template-columns: 1fr;
+  }
+  .columna-visual {
+    position: static;
+    order: 0;
+  }
+  .lamina-caja {
+    margin-bottom: 18px;
+  }
+  .lamina-dibujo svg {
+    height: 210px;
+  }
+  .lamina-datos {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+}
 
 @media (max-width: 980px) {
   .veredicto-cuerpo {
@@ -1408,7 +1640,7 @@ kbd {
 }
 
 /* ------------------------------------------------------------
-   6. Escenas de clima
+   7. Escenas de clima
    El JS pone data-clima / data-momento en <body> y llena
    #escena con las partículas calculadas a partir de los datos.
    ------------------------------------------------------------ */
@@ -1458,6 +1690,37 @@ body[data-momento="noche"][data-clima="nieve"],
 body[data-momento="noche"][data-clima="niebla"] {
   --fondo-a: #172032;
   --fondo-b: #2b3a4f;
+}
+
+/* --- Siluetas de la obra volando por el fondo --- */
+.silueta-flotante {
+  position: absolute;
+  left: 0;
+  width: 190px;
+  height: 250px;
+  opacity: 0.16;
+  animation-name: derivar;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.silueta-flotante svg {
+  width: 100%;
+  height: 100%;
+}
+/* En el fondo van planas, de un solo tono, para no competir
+   con la información del panel. */
+.ilustracion-fondo * {
+  fill: var(--silueta-fondo);
+  stroke: var(--silueta-fondo);
+  opacity: 1;
+  filter: none;
+}
+:root {
+  --silueta-fondo: #7d94ad;
+}
+body[data-momento="noche"] {
+  --silueta-fondo: #cbd5e1;
 }
 
 /* --- Nubes --- */

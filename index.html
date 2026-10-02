@@ -56,7 +56,31 @@
     </div>
   </header>
 
-  <main>
+  <main class="tablero">
+    <!-- ===== Columna derecha: la obra en imagen ===== -->
+    <aside class="columna-visual">
+      <div class="lamina-caja">
+        <figure class="lamina" id="lamina">
+          <div class="lamina-cielo" id="laminaCielo"></div>
+          <div class="lamina-dibujo" id="laminaDibujo"></div>
+          <span class="lamina-indice" id="laminaIndice" data-nivel="neutro">
+            <strong>--</strong>
+            <small>riesgo</small>
+          </span>
+          <figcaption>
+            <strong id="laminaNombre">Torre Rise</strong>
+            <span id="laminaTipo">Rascacielos de usos mixtos</span>
+          </figcaption>
+        </figure>
+        <p class="lamina-nota">
+          Ilustración propia de la obra. El cielo y las luces siguen al clima real del sitio.
+        </p>
+        <dl class="lamina-datos" id="laminaDatos"></dl>
+      </div>
+    </aside>
+
+    <!-- ===== Columna izquierda: toda la información ===== -->
+    <div class="columna-info">
     <!-- ===== Portada de la obra ===== -->
     <section id="obra" class="tarjeta portada revelable">
       <div class="portada-encabezado">
@@ -210,6 +234,7 @@
         <ul id="fichaFuentes"></ul>
       </div>
     </section>
+    </div>
   </main>
 
   <footer>
@@ -226,6 +251,7 @@
   </footer>
 
   <script src="datos.js"></script>
+  <script src="siluetas.js"></script>
   <script src="app.js"></script>
 </body>
 

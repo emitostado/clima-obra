@@ -533,6 +533,23 @@ function agregarRachas(escenario, m) {
   }
 }
 
+/**
+ * Siluetas de la obra derivando por el fondo, muy tenues, como si
+ * el proyecto flotara detrás del panel.
+ */
+function agregarSiluetas(escenario, obra) {
+  for (let i = 0; i < 3; i++) {
+    const flotante = crearParticula("silueta-flotante", {
+      top: azar(6, 58).toFixed(1) + "vh",
+      animationDuration: azar(95, 170).toFixed(1) + "s",
+      animationDelay: "-" + azar(0, 120).toFixed(1) + "s",
+      "--escala": azar(0.45, 1.05).toFixed(2)
+    });
+    flotante.innerHTML = svgDeObra(obra.id, "ilustracion-fondo");
+    escenario.appendChild(flotante);
+  }
+}
+
 function construirEscena(clima, m) {
   const escenario = document.getElementById("escena");
   document.body.dataset.clima = clima.escena;
@@ -609,6 +626,7 @@ function construirEscena(clima, m) {
     agregarNubes(escenario, Math.min(2, nubesPorCielo), "nube-oscura");
   }
 
+  agregarSiluetas(escenario, obraActual);
   agregarRachas(escenario, m);
 
   // Calor extremo: la imagen "vibra" como el aire sobre el asfalto.
@@ -620,6 +638,39 @@ function construirEscena(clima, m) {
 /* ------------------------------------------------------------
    7. Pintado del panel
    ------------------------------------------------------------ */
+
+/** Lámina de la columna derecha: la obra dibujada y sus datos. */
+function pintarLamina(obra) {
+  document.getElementById("laminaDibujo").innerHTML = svgDeObra(obra.id);
+  document.getElementById("laminaNombre").textContent = obra.nombre;
+  document.getElementById("laminaTipo").textContent = obra.tipo;
+
+  const indice = document.getElementById("laminaIndice");
+  indice.dataset.nivel = "neutro";
+  indice.querySelector("strong").textContent = "--";
+
+  // Las dos primeras cifras de la obra más su avance y su etapa.
+  const filas = obra.cifras.slice(0, 2).map(function (cifra) {
+    return [
+      cifra.etiqueta,
+      cifra.valor + (cifra.unidad ? " " + cifra.unidad : "")
+    ];
+  });
+  filas.push([
+    "Avance",
+    obra.avance === null ? "Sin cifra oficial" : obra.avance + " %"
+  ]);
+  filas.push(["Etapa", obra.etapa]);
+
+  const datos = document.getElementById("laminaDatos");
+  datos.innerHTML = "";
+  for (const fila of filas) {
+    const caja = nodo("div");
+    caja.appendChild(nodo("dt", null, escapar(fila[0])));
+    caja.appendChild(nodo("dd", null, escapar(fila[1])));
+    datos.appendChild(caja);
+  }
+}
 
 function pintarPortada(obra) {
   document.getElementById("obraBandera").textContent = obra.bandera;
@@ -748,6 +799,12 @@ function pintarVeredicto(riesgo, ventana) {
 
   document.getElementById("medidorValor").textContent = riesgo.indice;
   document.getElementById("veredicto").dataset.nivel = riesgo.nivel.clave;
+
+  // El mismo veredicto, sobre la ilustración de la obra.
+  const indiceLamina = document.getElementById("laminaIndice");
+  indiceLamina.dataset.nivel = riesgo.nivel.clave;
+  indiceLamina.querySelector("strong").textContent = riesgo.indice;
+  indiceLamina.title = riesgo.nivel.sello;
 
   // El arco del medidor es un círculo recortado con dasharray.
   // El color se fija aquí (y no por variables CSS) para que el arco
@@ -1348,6 +1405,7 @@ function seleccionarObra(obra) {
     // En file:// el navegador no permite cambiar la URL: no pasa nada.
   }
   pintarPortada(obra);
+  pintarLamina(obra);
   pintarListaProyectos();
   actualizarBoton();
   cerrarPanel();
@@ -1466,6 +1524,7 @@ setInterval(function () {
    ------------------------------------------------------------ */
 
 pintarPortada(obraActual);
+pintarLamina(obraActual);
 pintarListaProyectos();
 actualizarBoton();
 activarRevelado();
