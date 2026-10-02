@@ -1,288 +1,1780 @@
+/* ============================================================
+   estilos.css — Clima de obra
+
+   Índice:
+     1. Tokens de color (tema día y tema noche automático)
+     2. Base y cabecera
+     3. Componentes (tarjetas, chips, medidor, métricas…)
+     4. Pronósticos, viento, sol y comparativa
+     5. Responsivo
+     6. Escenas de clima (partículas del fondo)
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Tokens
+   ------------------------------------------------------------ */
+
+:root {
+  --fondo-a: #e0f2fe;
+  --fondo-b: #f4f7fb;
+  --fondo-pos: top left;
+
+  --superficie: rgba(255, 255, 255, 0.92);
+  --superficie-2: #f6f9fc;
+  --superficie-3: #eef3f9;
+  --borde: #e2e8f0;
+  --borde-fuerte: #cfdae8;
+
+  --texto: #16202f;
+  --texto-medio: #475569;
+  --texto-suave: #6b7a90;
+
+  --acento: #0369a1;
+  --acento-claro: #0ea5e9;
+  --acento-fondo: #e0f2fe;
+
+  --optimo-fg: #11603a;
+  --optimo-bg: #dcfce7;
+  --optimo-bd: #86efac;
+  --aceptable-fg: #075985;
+  --aceptable-bg: #dbeafe;
+  --aceptable-bd: #93c5fd;
+  --precaucion-fg: #92400e;
+  --precaucion-bg: #fef3c7;
+  --precaucion-bd: #fcd34d;
+  --critico-fg: #991b1b;
+  --critico-bg: #fee2e2;
+  --critico-bd: #fca5a5;
+  --neutro-fg: #475569;
+  --neutro-bg: #f1f5f9;
+  --neutro-bd: #cbd5e1;
+
+  --sombra: 0 6px 20px rgba(15, 23, 42, 0.06);
+  --sombra-alta: 0 18px 40px rgba(15, 23, 42, 0.16);
+  --radio: 16px;
+}
+
+/* Tema nocturno: se activa solo cuando en la obra ya es de noche. */
+body[data-momento="noche"] {
+  --superficie: rgba(16, 24, 39, 0.86);
+  --superficie-2: rgba(255, 255, 255, 0.045);
+  --superficie-3: rgba(255, 255, 255, 0.08);
+  --borde: rgba(148, 163, 184, 0.22);
+  --borde-fuerte: rgba(148, 163, 184, 0.35);
+
+  --texto: #e9eff8;
+  --texto-medio: #b6c3d4;
+  --texto-suave: #8fa0b6;
+
+  --acento: #7dd3fc;
+  --acento-claro: #38bdf8;
+  --acento-fondo: rgba(56, 189, 248, 0.14);
+
+  --optimo-fg: #86efac;
+  --optimo-bg: rgba(34, 197, 94, 0.16);
+  --optimo-bd: rgba(134, 239, 172, 0.38);
+  --aceptable-fg: #93c5fd;
+  --aceptable-bg: rgba(59, 130, 246, 0.16);
+  --aceptable-bd: rgba(147, 197, 253, 0.38);
+  --precaucion-fg: #fcd34d;
+  --precaucion-bg: rgba(245, 158, 11, 0.16);
+  --precaucion-bd: rgba(252, 211, 77, 0.38);
+  --critico-fg: #fca5a5;
+  --critico-bg: rgba(239, 68, 68, 0.18);
+  --critico-bd: rgba(252, 165, 165, 0.4);
+  --neutro-fg: #b6c3d4;
+  --neutro-bg: rgba(255, 255, 255, 0.06);
+  --neutro-bd: rgba(148, 163, 184, 0.3);
+
+  --sombra: 0 6px 22px rgba(0, 0, 0, 0.35);
+  --sombra-alta: 0 20px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* Colores por nivel, usados por [data-nivel] en todo el panel */
+[data-nivel="optimo"] {
+  --nivel-fg: var(--optimo-fg);
+  --nivel-bg: var(--optimo-bg);
+  --nivel-bd: var(--optimo-bd);
+}
+[data-nivel="aceptable"] {
+  --nivel-fg: var(--aceptable-fg);
+  --nivel-bg: var(--aceptable-bg);
+  --nivel-bd: var(--aceptable-bd);
+}
+[data-nivel="precaucion"] {
+  --nivel-fg: var(--precaucion-fg);
+  --nivel-bg: var(--precaucion-bg);
+  --nivel-bd: var(--precaucion-bd);
+}
+[data-nivel="critico"] {
+  --nivel-fg: var(--critico-fg);
+  --nivel-bg: var(--critico-bg);
+  --nivel-bd: var(--critico-bd);
+}
+[data-nivel="neutro"] {
+  --nivel-fg: var(--neutro-fg);
+  --nivel-bg: var(--neutro-bg);
+  --nivel-bd: var(--neutro-bd);
+}
+
+/* ------------------------------------------------------------
+   2. Base
+   ------------------------------------------------------------ */
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: system-ui, sans-serif;
-  max-width: 640px;
-  margin: 40px auto;
-  padding: 0 16px;
-
-  color: #1e293b;
-  background: #eaf4f8;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 26px 20px 60px;
+  color: var(--texto);
+  background:
+    radial-gradient(circle at var(--fondo-pos), var(--fondo-a) 0, transparent 42%),
+    var(--fondo-b);
+  transition: background 0.9s ease, color 0.5s ease;
+  min-height: 100vh;
 }
 
-/* ENCABEZADO */
+header,
+main,
+footer {
+  position: relative;
+  z-index: 1;
+}
 
-header {
-  background: linear-gradient(135deg, #0284c7, #38bdf8);
-  color: white;
+h1, h2, h3 {
+  letter-spacing: -0.4px;
+}
 
-  padding: 24px;
+a {
+  color: var(--acento);
+}
+
+.salto {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+}
+.salto:focus {
+  left: 12px;
+  top: 12px;
+  z-index: 50;
+  padding: 10px 14px;
+  background: var(--acento);
+  color: #fff;
+  border-radius: 8px;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--acento-claro);
+  outline-offset: 2px;
+}
+
+/* --- Cabecera --- */
+.cabecera {
+  position: relative;
+  padding: 26px 28px;
   margin-bottom: 20px;
-
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.2);
+  border-radius: 20px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(2, 132, 199, 0.35), transparent 60%),
+    linear-gradient(135deg, #0b1526, #1e3a5f);
+  box-shadow: var(--sombra-alta);
+  overflow: hidden;
 }
-
-header h1 {
-  margin: 0 0 6px;
+.cabecera::after {
+  /* Brillo diagonal sutil */
+  content: "";
+  position: absolute;
+  top: -60%;
+  right: -10%;
+  width: 55%;
+  height: 220%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.09),
+    transparent
+  );
+  transform: rotate(18deg);
+  pointer-events: none;
 }
-
-header p {
-  margin: 0;
+.cabecera-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
-
-/* SECCIONES */
-
-section {
-  background: white;
-
-  border: 1px solid #c7e3ed;
-  border-radius: 12px;
-
-  padding: 20px;
-  margin-bottom: 16px;
-
-  box-shadow: 0 4px 12px rgba(30, 100, 130, 0.08);
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
-
-section h2 {
-  margin-top: 0;
-  color: #0f5f7a;
-}
-
-/* INFORMACIÓN DEL CLIMA */
-
-.weather-info {
+.marca-icono {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  font-size: 26px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
-
-.weather-info > div {
-  padding: 18px;
-
-  border-radius: 10px;
-  text-align: center;
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.cabecera h1 {
+  margin: 0 0 4px;
+  font-size: 29px;
 }
-
-.weather-info > div:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* TEMPERATURA */
-
-.temperature {
-  background: #fff7d6;
-  border: 1px solid #fde68a;
-}
-
-.temperature strong {
-  color: #d97706;
-}
-
-.temperature p {
-  font-size: 28px;
-  font-weight: bold;
-
-  color: #ea580c;
-
-  margin: 10px 0 0;
-}
-
-/* VIENTO */
-
-.wind {
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
-}
-
-.wind strong {
-  color: #4f46e5;
-}
-
-.wind p {
-  font-size: 28px;
-  font-weight: bold;
-
-  color: #4338ca;
-
-  margin: 10px 0 0;
-}
-
-/* HUMEDAD */
-
-.humedad {
-  background: #ecfeff;
-  border: 1px solid #a5f3fc;
-}
-
-.humedad strong {
-  color: #0891b2;
-}
-
-.humedad p {
-  font-size: 28px;
-  font-weight: bold;
-
-  color: #0e7490;
-
-  margin: 10px 0 0;
-}
-
-/* PRECIPITACIÓN */
-
-.precipitacion {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-}
-
-.precipitacion strong {
-  color: #2563eb;
-}
-
-.precipitacion p {
-  font-size: 28px;
-  font-weight: bold;
-
-  color: #1d4ed8;
-
-  margin: 10px 0 0;
-}
-
-/* CARACTERÍSTICAS */
-
-#caracteristicas ul {
-  padding-left: 20px;
-}
-
-#caracteristicas li {
-  margin-bottom: 8px;
-}
-
-/* TABLA */
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #dbeafe;
-}
-
-th {
-  background: #e0f2fe;
-  color: #0f5f7a;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 500px) {
-
-  body {
-    margin: 20px auto;
-  }
-
-  header {
-    padding: 20px;
-  }
-
-  section {
-    padding: 16px;
-  }
-
-  .weather-info {
-    grid-template-columns: 1fr;
-  }
-
-  .weather-info > div {
-    padding: 16px;
-  }
-}
-
-#actualizar {
-  margin-top: 16px;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  background: #0284c7;
-  color: white;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-#actualizar:hover {
-  background: #0369a1;
-}
-
-#ultima-actualizacion {
-  margin-top: 8px;
+.cabecera p {
+  margin: 0;
+  color: #c3d3e6;
   font-size: 14px;
-  color: #64748b;
+}
+.cabecera-acciones {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.reloj {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: right;
+}
+.reloj strong {
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+.reloj span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #9fb4cc;
+}
+.btn-proyecto {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: left;
+}
+.btn-proyecto:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+.btn-proyecto-texto {
+  display: flex;
+  flex-direction: column;
+}
+.btn-proyecto-texto strong {
+  font-size: 15px;
+}
+.btn-proyecto-texto small {
+  font-size: 10.5px;
+  color: #9fb4cc;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.chevron {
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.25s;
+}
+.btn-proyecto[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+.btn-icono {
+  width: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-icono:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+.btn-icono:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+body.cargando .btn-icono-glifo {
+  display: inline-block;
+  animation: girar 1s linear infinite;
 }
 
-#alerta-colado {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: bold;
+/* --- Panel de proyectos --- */
+.panel-proyectos {
+  display: none;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.panel-proyectos.abierto {
+  display: block;
+  animation: aparecer 0.25s ease;
+}
+.panel-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: #cbd9e8;
+  font-weight: 600;
+}
+.panel-titulo small {
+  font-size: 11px;
+  color: #8fa6bf;
+  font-weight: 400;
+}
+.lista-proyectos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+.proyecto-opcion {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.18s;
+}
+.proyecto-opcion:hover {
+  background: rgba(14, 165, 233, 0.35);
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+}
+.proyecto-opcion.activo {
+  background: rgba(14, 165, 233, 0.45);
+  border-color: #7dd3fc;
+}
+.proyecto-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.proyecto-texto strong {
+  font-size: 14px;
+}
+.proyecto-texto small {
+  font-size: 11.5px;
+  color: #bdcde0;
+}
+.proyecto-texto em {
+  font-size: 10.5px;
+  font-style: normal;
+  color: #8fa6bf;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+.proyecto-avance {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #7dd3fc;
 }
 
-.colado-ok {
-  background: #dcfce7;
-  border: 1px solid #86efac;
-  color: #166534;
+/* ------------------------------------------------------------
+   3. Tarjetas y componentes
+   ------------------------------------------------------------ */
+
+.tarjeta {
+  background: var(--superficie);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 24px;
+  margin-bottom: 18px;
+  box-shadow: var(--sombra);
+  transition: background 0.5s ease, border-color 0.5s ease;
+}
+.tarjeta h2 {
+  margin: 3px 0 0;
+  font-size: 21px;
+  color: var(--texto);
+}
+.revelable {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.revelable.visible {
+  opacity: 1;
+  transform: none;
+}
+.etiqueta {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  color: var(--acento);
+}
+.titulo-seccion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.nota {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+.leyenda {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--texto-suave);
+}
+.punto {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
+.punto-lluvia {
+  background: var(--acento-claro);
+}
+.punto-riesgo {
+  background: #f59e0b;
+}
+.momento {
+  padding: 7px 13px;
+  border-radius: 20px;
+  background: var(--superficie-3);
+  border: 1px solid var(--borde);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--texto-medio);
 }
 
-.colado-alerta {
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #991b1b;
+/* --- Portada de la obra --- */
+.portada-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
 }
-
-.colado-sin-datos {
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  color: #475569;
+.portada h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 30px;
+  margin: 4px 0 6px;
 }
-
-#obras {
+.portada-lugar {
+  margin: 0;
+  color: var(--texto-medio);
+  font-size: 14px;
+}
+.separador {
+  margin: 0 6px;
+  color: var(--texto-suave);
+}
+.portada-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 7px;
+  max-width: 440px;
+  justify-content: flex-end;
+}
+/* Windows dibuja las banderas emoji como el par de letras del país
+   (MX, GB, AU…). Se les da forma de insignia para que se vea
+   intencional en cualquier sistema. */
+.bandera {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.2em;
+  padding: 0.18em 0.4em;
+  border-radius: 0.45em;
+  background: var(--superficie-3);
+  border: 1px solid var(--borde);
+  font-size: 0.52em;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  line-height: 1.25;
+  color: var(--texto-medio);
+}
+.btn-proyecto-bandera,
+.proyecto-bandera {
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #e2eaf4;
+}
+.flota-bandera {
+  font-size: 12px;
+  justify-self: start;
 }
 
-.obra {
-  flex: 1 1 240px;
-  background: white;
-  border: 1px solid #c7e3ed;
-  border-radius: 10px;
+.chip {
+  padding: 6px 11px;
+  border-radius: 20px;
+  background: var(--acento-fondo);
+  border: 1px solid var(--borde);
+  color: var(--acento);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.chip-estado {
+  background: var(--optimo-bg);
+  border-color: var(--optimo-bd);
+  color: var(--optimo-fg);
+}
+.chip-tenue {
+  background: var(--superficie-3);
+  color: var(--texto-medio);
+}
+.portada-resumen {
+  margin: 18px 0 20px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--texto-medio);
+  max-width: 76ch;
+}
+
+.avance {
+  padding: 16px 18px;
+  border-radius: 13px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.avance-cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--texto-medio);
+}
+.avance-cabeza strong {
+  font-size: 19px;
+  color: var(--acento);
+  font-variant-numeric: tabular-nums;
+}
+.avance-pista {
+  height: 12px;
+  border-radius: 20px;
+  background: var(--superficie-3);
+  border: 1px solid var(--borde);
+  overflow: hidden;
+}
+.avance-relleno {
+  width: 0;
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #0284c7, #22d3ee, #34d399);
+  background-size: 200% 100%;
+  transition: width 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: deslizar-brillo 4s linear infinite;
+}
+.avance-sin-dato {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--superficie-3) 0 8px,
+    var(--superficie-2) 8px 16px
+  );
+}
+.avance .nota {
+  margin-top: 10px;
+}
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.cifra {
   padding: 16px;
+  border-radius: 13px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  transition: transform 0.2s, border-color 0.2s;
+}
+.cifra:hover {
+  transform: translateY(-3px);
+  border-color: var(--acento-claro);
+}
+.cifra-valor {
+  display: block;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--acento);
+  font-variant-numeric: tabular-nums;
+}
+.cifra-unidad {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-medio);
+}
+.cifra-etiqueta {
+  display: block;
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--texto-suave);
 }
 
-.obra h3 {
-  margin: 0 0 10px;
-  color: #0f5f7a;
+/* --- Veredicto --- */
+.sello {
+  padding: 9px 16px;
+  border-radius: 22px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+  color: var(--nivel-fg, var(--neutro-fg));
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  transition: 0.4s;
 }
-
-.obra p {
-  margin: 4px 0;
+.veredicto-cuerpo {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 26px;
+  align-items: center;
 }
-
-.obra .colado-ok,
-.obra .colado-alerta,
-.obra .colado-sin-datos {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-weight: bold;
+.medidor {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+.medidor svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.medidor-pista,
+.medidor-arco {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+}
+.medidor-pista {
+  stroke: var(--superficie-3);
+}
+.medidor-arco {
+  /* El color y el recorte los fija app.js; aquí solo el arranque. */
+  stroke: #94a3b8;
+  stroke-dasharray: 502.65;
+  stroke-dashoffset: 502.65;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.5s;
+}
+.medidor-centro {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+.medidor-centro strong {
+  display: block;
+  font-size: 50px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+.medidor-centro span {
+  display: block;
+  margin-top: 4px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--texto-suave);
+}
+.veredicto-frase {
+  margin: 0 0 16px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--texto-medio);
+}
+.factores {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.factor {
+  display: grid;
+  grid-template-columns: 26px 1fr 90px 68px;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+}
+.factor-icono {
+  font-size: 17px;
+}
+.factor-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.factor-texto strong {
+  font-size: 13px;
+  color: var(--texto);
+}
+.factor-texto small {
+  font-size: 11.5px;
+  color: var(--texto-medio);
+}
+.factor-barra {
+  height: 7px;
+  border-radius: 10px;
+  background: rgba(127, 140, 160, 0.25);
+  overflow: hidden;
+}
+.factor-barra i {
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background: var(--nivel-fg, var(--neutro-fg));
+  transition: width 0.9s ease;
+}
+.factor-peso {
+  font-size: 10.5px;
+  text-align: right;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+.ventana {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+}
+.ventana-icono {
+  font-size: 22px;
+}
+.ventana strong {
+  display: block;
   font-size: 14px;
+  color: var(--texto);
+}
+.ventana small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--texto-medio);
+}
+
+/* --- Métricas --- */
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 12px;
+}
+.metrica {
+  position: relative;
+  padding: 15px 16px 16px;
+  border-radius: 13px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.metrica::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--nivel-fg, var(--neutro-fg));
+}
+.metrica:hover {
+  transform: translateY(-3px);
+}
+.metrica-icono {
+  font-size: 18px;
+}
+.metrica-etiqueta {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--texto-suave);
+}
+.metrica-valor {
+  display: block;
+  margin-top: 3px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+.metrica-valor em {
+  margin-left: 3px;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+.metrica-detalle {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--texto-medio);
+}
+
+/* ------------------------------------------------------------
+   4. Viento, sol, pronósticos y comparativa
+   ------------------------------------------------------------ */
+
+.dupla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.dupla .tarjeta {
+  margin-bottom: 18px;
+}
+
+.viento-cuerpo {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 20px;
+  align-items: center;
+  margin-top: 16px;
+}
+.compas svg {
+  width: 100%;
+  height: auto;
+}
+.compas-fondo {
+  fill: var(--superficie-2);
+}
+.compas-aro {
+  fill: none;
+  stroke: var(--borde-fuerte);
+  stroke-width: 2;
+}
+.compas-aro-int {
+  fill: none;
+  stroke: var(--borde);
+  stroke-width: 1;
+  stroke-dasharray: 3 7;
+}
+.compas-letra {
+  fill: var(--texto-suave);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+}
+.compas-aguja {
+  transform-origin: 100px 100px;
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.compas-aguja polygon {
+  fill: var(--acento-claro);
+}
+.compas-cola {
+  fill: var(--borde-fuerte);
+}
+.compas-centro {
+  fill: var(--texto);
+}
+.viento-datos {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.viento-datos > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.viento-datos dt {
+  font-size: 11.5px;
+  color: var(--texto-suave);
+}
+.viento-datos dd {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--texto);
+  text-align: right;
+}
+.viento-aviso {
+  background: var(--nivel-bg, var(--neutro-bg)) !important;
+  border-color: var(--nivel-bd, var(--neutro-bd)) !important;
+}
+.viento-aviso dd {
+  font-size: 11.5px !important;
+  font-weight: 600;
+  color: var(--nivel-fg, var(--neutro-fg)) !important;
+  max-width: 60%;
+}
+
+.sol-cuerpo {
+  margin-top: 10px;
+}
+.arco {
+  width: 100%;
+  height: auto;
+}
+.arco-pista {
+  fill: none;
+  stroke: var(--superficie-3);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+.arco-recorrido {
+  fill: none;
+  stroke: var(--precaucion-fg);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s ease;
+}
+.arco-suelo {
+  stroke: var(--borde-fuerte);
+  stroke-width: 2;
+  stroke-dasharray: 4 6;
+}
+.arco-sol {
+  fill: #fbbf24;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.85));
+}
+.arco-hora {
+  fill: var(--texto-suave);
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+}
+.sol-mensaje {
+  margin: 4px 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto-medio);
+  text-align: center;
+}
+.sol-datos {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.sol-datos > div {
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.sol-datos dt {
+  font-size: 11px;
+  color: var(--texto-suave);
+}
+.sol-datos dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+/* --- Tira de 24 horas --- */
+.tira {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  scrollbar-width: thin;
+}
+.hora {
+  flex: 0 0 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  transition: 0.2s;
+}
+.hora:hover {
+  transform: translateY(-3px);
+  border-color: var(--acento-claro);
+}
+.hora-ahora {
+  background: var(--acento-fondo);
+  border-color: var(--acento-claro);
+  box-shadow: 0 0 0 2px var(--acento-fondo);
+}
+.hora-reloj {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+.hora-icono {
+  font-size: 17px;
+}
+.hora-temp {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--texto);
+}
+.hora-grafica {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 74px;
+  width: 100%;
+  justify-content: center;
+}
+.hora-grafica i {
+  display: block;
+  width: 9px;
+  border-radius: 4px 4px 2px 2px;
+  transition: height 0.7s ease;
+}
+.hora-lluvia {
+  background: var(--acento-claro);
+}
+.hora-riesgo {
+  background: var(--nivel-fg, var(--neutro-fg));
+}
+.hora-prob {
+  font-size: 10.5px;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Siete días --- */
+.dias-lista {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+.dia {
+  display: grid;
+  grid-template-columns: 92px 34px 1fr 76px 92px 140px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  transition: 0.2s;
+}
+.dia:hover {
+  border-color: var(--acento-claro);
+  transform: translateX(3px);
+}
+.dia-nombre {
+  display: flex;
+  flex-direction: column;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--texto);
+}
+.dia-nombre small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+.dia-icono {
+  font-size: 20px;
+  text-align: center;
+}
+.dia-rango {
+  position: relative;
+  height: 8px;
+  border-radius: 10px;
+  background: var(--superficie-3);
+}
+.dia-rango i {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #38bdf8, #fbbf24, #f87171);
+}
+.dia-temps {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dia-temps strong {
+  font-size: 15px;
+  color: var(--texto);
+}
+.dia-temps small {
+  margin-left: 5px;
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+.dia-lluvia {
+  font-size: 12px;
+  color: var(--texto-medio);
+  text-align: right;
+}
+.dia-lluvia small {
+  display: block;
+  font-size: 10.5px;
+  color: var(--texto-suave);
+}
+.dia-sello {
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+  color: var(--nivel-fg, var(--neutro-fg));
+  font-size: 10.5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* --- Comparativa de obras --- */
+.flota-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: 12px;
+}
+.flota-tarjeta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 15px;
+  border-radius: 13px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  text-align: left;
+  color: var(--texto);
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.flota-tarjeta:hover {
+  transform: translateY(-4px);
+  border-color: var(--acento-claro);
+  box-shadow: var(--sombra);
+}
+.flota-activa {
+  border-color: var(--acento-claro);
+  box-shadow: 0 0 0 2px var(--acento-fondo);
+}
+.flota-cargando {
+  opacity: 0.6;
+  animation: latir-suave 1.4s ease-in-out infinite;
+}
+.flota-clima {
+  position: absolute;
+  top: 12px;
+  right: 13px;
+  font-size: 21px;
+}
+.flota-tarjeta strong {
+  font-size: 14px;
+  line-height: 1.3;
+}
+.flota-tarjeta small {
+  font-size: 11px;
+  color: var(--texto-suave);
+  line-height: 1.35;
+}
+.flota-lectura {
+  margin-top: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-medio);
+  font-variant-numeric: tabular-nums;
+}
+.flota-sello {
+  margin-top: 8px;
+  padding: 5px 9px;
+  border-radius: 18px;
+  background: var(--nivel-bg, var(--neutro-bg));
+  border: 1px solid var(--nivel-bd, var(--neutro-bd));
+  color: var(--nivel-fg, var(--neutro-fg));
+  font-size: 10.5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* --- Ficha y fuentes --- */
+table {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 12px 13px;
+  text-align: left;
+  border-bottom: 1px solid var(--borde);
+  font-size: 13.5px;
+  color: var(--texto-medio);
+  vertical-align: top;
+}
+thead th {
+  background: var(--superficie-3);
+  color: var(--texto);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.ficha-dato {
+  width: 32%;
+  color: var(--texto);
+  font-weight: 600;
+  background: var(--superficie-2);
+}
+tbody tr:last-child td,
+tbody tr:last-child th {
+  border-bottom: none;
+}
+.fuentes {
+  margin-top: 20px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+.fuentes h3 {
+  margin: 0 0 9px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--texto-suave);
+}
+.fuentes ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 5px;
+}
+.fuentes li {
+  font-size: 13px;
+}
+
+footer {
+  margin-top: 26px;
+  padding: 20px 24px;
+  border-radius: var(--radio);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--texto-medio);
+}
+footer p {
+  margin: 0 0 7px;
+}
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--superficie-3);
+  border: 1px solid var(--borde-fuerte);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+/* ------------------------------------------------------------
+   5. Responsivo
+   ------------------------------------------------------------ */
+
+@media (max-width: 980px) {
+  .veredicto-cuerpo {
+    grid-template-columns: 1fr;
+  }
+  .dupla {
+    grid-template-columns: 1fr;
+  }
+  .dia {
+    grid-template-columns: 82px 30px 1fr 70px 80px;
+  }
+  .dia-sello {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  body {
+    padding: 14px 14px 40px;
+  }
+  .cabecera {
+    padding: 20px;
+  }
+  .cabecera-fila {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cabecera-acciones {
+    flex-wrap: wrap;
+  }
+  .btn-proyecto {
+    flex: 1;
+  }
+  .reloj {
+    text-align: left;
+  }
+  .tarjeta {
+    padding: 18px;
+  }
+  .portada h2 {
+    font-size: 24px;
+  }
+  .portada-chips {
+    justify-content: flex-start;
+    max-width: none;
+  }
+  .factor {
+    grid-template-columns: 24px 1fr;
+  }
+  .factor-barra,
+  .factor-peso {
+    display: none;
+  }
+  .viento-cuerpo {
+    grid-template-columns: 1fr;
+  }
+  .compas {
+    max-width: 190px;
+    margin: 0 auto;
+  }
+  .dia {
+    grid-template-columns: 74px 28px 1fr 64px;
+  }
+  .dia-lluvia {
+    display: none;
+  }
+  .sol-datos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------------------
+   6. Escenas de clima
+   El JS pone data-clima / data-momento en <body> y llena
+   #escena con las partículas calculadas a partir de los datos.
+   ------------------------------------------------------------ */
+
+#escena {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body[data-clima="sol"] {
+  --fondo-a: #fde68a;
+  --fondo-b: #f2f8ff;
+  --fondo-pos: 88% -8%;
+}
+body[data-clima="nubes"] {
+  --fondo-a: #d6dfeb;
+  --fondo-b: #eef1f6;
+}
+body[data-clima="lluvia"] {
+  --fondo-a: #b3c6da;
+  --fondo-b: #e2e8ef;
+}
+body[data-clima="tormenta"] {
+  --fondo-a: #8aa0b9;
+  --fondo-b: #d2dae3;
+}
+body[data-clima="nieve"] {
+  --fondo-a: #e6f2ff;
+  --fondo-b: #f4f8fc;
+}
+body[data-clima="niebla"] {
+  --fondo-a: #dae0e6;
+  --fondo-b: #e8ecf0;
+}
+body[data-clima="noche"] {
+  --fondo-a: #10192b;
+  --fondo-b: #1b2537;
+  --fondo-pos: 82% -6%;
+}
+body[data-momento="noche"][data-clima="nubes"],
+body[data-momento="noche"][data-clima="lluvia"],
+body[data-momento="noche"][data-clima="tormenta"],
+body[data-momento="noche"][data-clima="nieve"],
+body[data-momento="noche"][data-clima="niebla"] {
+  --fondo-a: #172032;
+  --fondo-b: #2b3a4f;
+}
+
+/* --- Nubes --- */
+.nube {
+  position: absolute;
+  left: 0;
+  width: 190px;
+  height: 56px;
+  border-radius: 56px;
+  animation-name: derivar;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.nube::before,
+.nube::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+}
+.nube::before {
+  width: 76px;
+  height: 76px;
+  top: -32px;
+  left: 26px;
+}
+.nube::after {
+  width: 104px;
+  height: 104px;
+  top: -50px;
+  right: 22px;
+}
+.nube-clara {
+  background: #ffffff;
+}
+.nube-gris {
+  background: #c7d3e2;
+}
+.nube-oscura {
+  background: #8797ad;
+}
+@keyframes derivar {
+  from {
+    transform: translateX(-35vw) scale(var(--escala, 1));
+  }
+  to {
+    transform: translateX(125vw) scale(var(--escala, 1));
+  }
+}
+
+/* --- Lluvia (se inclina con el viento real) --- */
+.gota {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, rgba(56, 132, 255, 0), #3b82f6);
+  animation-name: caer;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+@keyframes caer {
+  from {
+    transform: translate3d(0, -15vh, 0) rotate(var(--giro, 0deg));
+  }
+  to {
+    transform: translate3d(var(--dx, 6vw), 112vh, 0) rotate(var(--giro, 0deg));
+  }
+}
+
+/* --- Rachas de viento --- */
+.racha {
+  position: absolute;
+  left: -30vw;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.75),
+    transparent
+  );
+  animation-name: barrer;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+@keyframes barrer {
+  from {
+    transform: translateX(0) scaleX(0.4);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translateX(calc(var(--sentido, 1) * 160vw)) scaleX(1);
+    opacity: 0;
+  }
+}
+
+/* --- Tormenta --- */
+.relampago {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  animation-name: destello;
+  animation-duration: 7s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes destello {
+  0%, 90%, 100% { opacity: 0; }
+  91% { opacity: 0.68; }
+  92.5% { opacity: 0.08; }
+  94% { opacity: 0.48; }
+  95.5% { opacity: 0; }
+}
+.rayo {
+  position: absolute;
+  top: 4vh;
+  left: 62vw;
+  width: 100px;
+  height: 46vh;
+  background: linear-gradient(#fffbea, #fcd34d);
+  clip-path: polygon(54% 0, 26% 46%, 47% 46%, 16% 100%, 68% 40%, 44% 40%, 74% 0);
+  filter: drop-shadow(0 0 14px rgba(252, 211, 77, 0.9));
+  opacity: 0;
+  animation-name: caer-rayo;
+  animation-duration: 7s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes caer-rayo {
+  0%, 90%, 100% { opacity: 0; }
+  91% { opacity: 1; }
+  92.5% { opacity: 0.15; }
+  94% { opacity: 0.85; }
+  95.5% { opacity: 0; }
+}
+
+/* --- Nieve --- */
+.copo {
+  position: absolute;
+  top: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+  animation-name: nevar;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+@keyframes nevar {
+  0% { transform: translate3d(0, -12vh, 0); }
+  50% { transform: translate3d(4vw, 50vh, 0); }
+  100% { transform: translate3d(-3vw, 112vh, 0); }
+}
+
+/* --- Sol --- */
+.sol {
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff8d6 0 26%,
+    rgba(253, 224, 71, 0.55) 44%,
+    rgba(253, 224, 71, 0) 70%
+  );
+  animation-name: latir;
+  animation-duration: 6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes latir {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+.rayos-sol {
+  position: absolute;
+  top: -45vh;
+  right: -45vh;
+  width: 100vh;
+  height: 100vh;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(250, 204, 21, 0.2) 0deg 4deg,
+    transparent 4deg 17deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 18%, transparent 70%);
+  animation-name: girar;
+  animation-duration: 90s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+.mota {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(251, 191, 36, 0.55);
+  animation-name: flotar;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes flotar {
+  0%, 100% { transform: translate(0, 0); opacity: 0.25; }
+  50% { transform: translate(16px, -28px); opacity: 0.9; }
+}
+
+/* --- Calor extremo --- */
+.calor {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 196, 120, 0.08) 0 2px,
+    transparent 2px 7px
+  );
+  animation-name: vibrar;
+  animation-duration: 2.6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes vibrar {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50% { transform: translateY(5px); opacity: 0.9; }
+}
+
+/* --- Niebla --- */
+.banda-niebla {
+  position: absolute;
+  left: -20vw;
+  width: 140vw;
+  height: 95px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.85),
+    rgba(226, 232, 240, 0.65),
+    transparent
+  );
+  filter: blur(14px);
+  animation-name: derivar-niebla;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+@keyframes derivar-niebla {
+  from { transform: translateX(-22vw); }
+  to { transform: translateX(22vw); }
+}
+
+/* --- Noche --- */
+.luna {
+  position: absolute;
+  top: 7vh;
+  right: 9vw;
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 33%, #fffdf0, #dbe4ee);
+  box-shadow:
+    0 0 45px rgba(226, 232, 240, 0.85),
+    0 0 110px rgba(148, 163, 184, 0.5);
+}
+.estrella {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+  animation-name: titilar;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes titilar {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+/* --- Animaciones compartidas de interfaz --- */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes deslizar-brillo {
+  from { background-position: 0% 50%; }
+  to { background-position: 200% 50%; }
+}
+@keyframes latir-suave {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.8; }
+}
+
+/* Quien prefiere menos movimiento se queda con el color de fondo. */
+@media (prefers-reduced-motion: reduce) {
+  #escena {
+    display: none;
+  }
+  .revelable {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
