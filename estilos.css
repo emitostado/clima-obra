@@ -330,41 +330,70 @@ body.cargando .btn-icono-glifo {
   animation: girar 1s linear infinite;
 }
 
-/* --- Barra de acciones --- */
-.acciones {
+/* --- Menú de acciones --- */
+.menu-acciones {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.menu-acciones > summary {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  list-style: none;
+  transition: 0.2s;
+}
+.menu-acciones > summary::-webkit-details-marker {
+  display: none;
+}
+.menu-acciones > summary:hover,
+.menu-acciones[open] > summary {
+  background: rgba(255, 255, 255, 0.2);
+}
+.menu-lista {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: 4px;
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 13px;
+  background: #0f1d31;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+  animation: aparecer 0.18s ease;
 }
 .accion {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: none;
   color: #e8f0fa;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
+  text-align: left;
   cursor: pointer;
-  transition: 0.18s;
+  transition: 0.15s;
 }
 .accion:hover {
-  background: rgba(14, 165, 233, 0.4);
+  background: rgba(14, 165, 233, 0.32);
   border-color: #38bdf8;
-  transform: translateY(-2px);
-}
-.accion:active {
-  transform: translateY(0);
 }
 .accion span {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 /* --- Avisos de las acciones --- */
@@ -583,12 +612,6 @@ body.cargando .btn-icono-glifo {
   font-size: 11.5px;
   color: var(--texto-suave);
 }
-.lamina-nota {
-  margin: 11px 2px 13px;
-  font-size: 11px;
-  line-height: 1.5;
-  color: var(--texto-suave);
-}
 .lamina-datos {
   margin: 0;
   display: grid;
@@ -766,25 +789,111 @@ body[data-momento="noche"] .il-luz {
   color: var(--texto-medio);
 }
 
-/* --- Portada de la obra --- */
-.portada-encabezado {
+/* --- Pestañas --- */
+.pestanas {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--superficie);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra);
+  overflow-x: auto;
+}
+.pestana {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 14px;
+  white-space: nowrap;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--texto-medio);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.18s;
+}
+.pestana:hover {
+  background: var(--superficie-3);
+  color: var(--texto);
+}
+.pestana[aria-selected="true"] {
+  background: var(--acento);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+body[data-momento="noche"] .pestana[aria-selected="true"] {
+  color: #06202f;
+}
+.pestana span {
+  font-size: 15px;
+}
+
+/* --- Resumen fijo: obra + veredicto --- */
+.resumen-encabezado {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 18px;
+  gap: 16px;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
-.portada h2 {
+.resumen-nombre {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 30px;
-  margin: 4px 0 6px;
+  font-size: 28px;
+  margin: 4px 0 5px;
 }
-.portada-lugar {
+.resumen-lugar {
   margin: 0;
   color: var(--texto-medio);
-  font-size: 14px;
+  font-size: 13.5px;
+}
+
+/* --- Desplegables: lo secundario empieza cerrado --- */
+.desglose {
+  margin-top: 14px;
+}
+.desglose > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 9px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  color: var(--texto-medio);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  transition: 0.18s;
+}
+.desglose > summary::-webkit-details-marker {
+  display: none;
+}
+.desglose > summary::before {
+  content: "▸";
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+.desglose[open] > summary::before {
+  transform: rotate(90deg);
+}
+.desglose > summary:hover {
+  border-color: var(--acento-claro);
+  color: var(--texto);
+}
+.desglose[open] > summary {
+  margin-bottom: 14px;
 }
 .separador {
   margin: 0 6px;
@@ -823,7 +932,7 @@ body[data-momento="noche"] .il-luz {
 }
 .flota-bandera {
   font-size: 12px;
-  justify-self: start;
+  align-self: flex-start;
 }
 
 .chip {
@@ -1833,6 +1942,13 @@ kbd {
    6. Responsivo
    ------------------------------------------------------------ */
 
+.panel {
+  display: grid;
+}
+.panel[hidden] {
+  display: none;
+}
+
 /* Debajo de 1180 px la columna de la obra ya no cabe al lado:
    pasa arriba del todo, como portada del panel. */
 @media (max-width: 1180px) {
@@ -2320,14 +2436,22 @@ body[data-momento="noche"] {
 
 @media print {
   #escena,
-  .acciones,
+  .menu-acciones,
   .panel-proyectos,
+  .pestanas,
   .btn-proyecto,
   .btn-icono,
   .aviso,
   #flota,
   .salto {
     display: none !important;
+  }
+  /* En papel se imprime todo, no solo la pestaña abierta. */
+  .panel[hidden] {
+    display: block !important;
+  }
+  .desglose > summary {
+    display: none;
   }
   body {
     max-width: none;

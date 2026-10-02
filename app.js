@@ -686,13 +686,7 @@ function pintarPortada(obra) {
   chips.innerHTML = "";
   chips.appendChild(nodo("span", "chip chip-estado", escapar(obra.estado)));
   chips.appendChild(nodo("span", "chip", escapar(obra.tipo)));
-  chips.appendChild(nodo("span", "chip", escapar(obra.etapa)));
-  chips.appendChild(
-    nodo("span", "chip chip-tenue", "Inicio: " + escapar(obra.inicio))
-  );
-  chips.appendChild(
-    nodo("span", "chip chip-tenue", "Meta: " + escapar(obra.fin))
-  );
+  chips.appendChild(nodo("span", "chip chip-tenue", escapar(obra.etapa)));
 
   // Barra de avance
   const relleno = document.getElementById("avanceRelleno");
@@ -1794,8 +1788,32 @@ function conectarAcciones() {
       window.print();
     });
 
+  // En papel conviene que salga todo, también lo que está plegado.
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details.desglose").forEach(function (caja) {
+      caja.dataset.abiertoAntes = caja.open ? "si" : "no";
+      caja.open = true;
+    });
+  });
+  window.addEventListener("afterprint", function () {
+    document.querySelectorAll("details.desglose").forEach(function (caja) {
+      caja.open = caja.dataset.abiertoAntes === "si";
+    });
+  });
+
   document.getElementById("accionTema")
     .addEventListener("click", girarTema);
+
+  // El menú se cierra al elegir una acción o al tocar fuera.
+  const menu = document.getElementById("menuAcciones");
+  menu.querySelector(".menu-lista").addEventListener("click", function () {
+    menu.open = false;
+  });
+  document.addEventListener("click", function (evento) {
+    if (menu.open && !menu.contains(evento.target)) {
+      menu.open = false;
+    }
+  });
 
   document.getElementById("accionPantalla")
     .addEventListener("click", async function () {
@@ -1977,6 +1995,47 @@ function cerrarPanel() {
    13. Aparición de secciones al hacer scroll
    ------------------------------------------------------------ */
 
+/* --- Pestañas --- */
+
+const PESTANAS = ["hoy", "pronostico", "proyecto", "obras"];
+
+function mostrarPestana(nombre) {
+  for (const clave of PESTANAS) {
+    const boton = document.getElementById("tab-" + clave);
+    const panel = document.getElementById("panel-" + clave);
+    const activa = clave === nombre;
+    boton.setAttribute("aria-selected", activa ? "true" : "false");
+    panel.hidden = !activa;
+    if (activa) {
+      // Las secciones ocultas nunca cruzaron la pantalla, así que
+      // el observador de scroll no las reveló: se muestran aquí.
+      panel.querySelectorAll(".revelable").forEach(function (seccion) {
+        seccion.classList.add("visible");
+      });
+    }
+  }
+}
+
+function conectarPestanas() {
+  for (const clave of PESTANAS) {
+    document.getElementById("tab-" + clave)
+      .addEventListener("click", function () {
+        mostrarPestana(clave);
+        try {
+          // Deja la pestaña en la dirección, para poder compartirla.
+          history.replaceState(null, "", "#" + clave);
+        } catch (error) {
+          // En file:// el navegador no deja cambiar la dirección.
+        }
+      });
+  }
+  // Se puede llegar directo a una pestaña: index.html#proyecto
+  const pedida = location.hash.replace("#", "");
+  if (PESTANAS.indexOf(pedida) !== -1) {
+    mostrarPestana(pedida);
+  }
+}
+
 function activarRevelado() {
   const secciones = document.querySelectorAll(".revelable");
   if (!("IntersectionObserver" in window)) {
@@ -2025,8 +2084,11 @@ document.addEventListener("keydown", function (evento) {
   } else if (evento.key === "r" || evento.key === "R") {
     cargarObra();
     pintarFlota();
+  } else if (evento.key >= "1" && evento.key <= "4") {
+    mostrarPestana(PESTANAS[Number(evento.key) - 1]);
   } else if (evento.key === "Escape") {
     cerrarPanel();
+    document.getElementById("menuAcciones").open = false;
   }
 });
 
@@ -2044,6 +2106,7 @@ pintarLamina(obraActual);
 pintarCalendario(obraActual);
 pintarCronologia(obraActual);
 conectarAcciones();
+conectarPestanas();
 leerTemaGuardado();
 pintarListaProyectos();
 actualizarBoton();

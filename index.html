@@ -14,7 +14,7 @@
   <!-- Capa de partículas: la llena app.js según el clima real -->
   <div id="escena" aria-hidden="true"></div>
 
-  <a class="salto" href="#veredicto">Saltar al veredicto de colado</a>
+  <a class="salto" href="#resumen">Saltar al veredicto de colado</a>
 
   <header class="cabecera">
     <div class="cabecera-fila">
@@ -31,6 +31,7 @@
           <strong id="relojHora">--:--</strong>
           <span id="relojZona">hora en sitio</span>
         </div>
+
         <button id="btnProyecto" class="btn-proyecto" type="button" aria-expanded="false"
           aria-controls="panelProyectos">
           <span class="bandera btn-proyecto-bandera" id="btnProyectoBandera" aria-hidden="true">🇲🇽</span>
@@ -40,35 +41,43 @@
           </span>
           <span class="chevron" aria-hidden="true">⌄</span>
         </button>
+
+        <!-- Las acciones viven en un menú para no llenar la cabecera -->
+        <details class="menu-acciones" id="menuAcciones">
+          <summary title="Acciones del panel">
+            <span aria-hidden="true">⋯</span>
+            <span class="solo-lectores">Acciones del panel</span>
+          </summary>
+          <div class="menu-lista">
+            <button type="button" class="accion" id="accionReporte">
+              <span aria-hidden="true">📋</span> Copiar reporte
+            </button>
+            <button type="button" class="accion" id="accionCsv">
+              <span aria-hidden="true">⬇️</span> Descargar CSV
+            </button>
+            <button type="button" class="accion" id="accionCompartir">
+              <span aria-hidden="true">🔗</span> Compartir
+            </button>
+            <button type="button" class="accion" id="accionMapa">
+              <span aria-hidden="true">📍</span> Ver en el mapa
+            </button>
+            <button type="button" class="accion" id="accionImprimir">
+              <span aria-hidden="true">🖨️</span> Imprimir
+            </button>
+            <button type="button" class="accion" id="accionTema" aria-live="polite">
+              <span aria-hidden="true">🌗</span> Tema: automático
+            </button>
+            <button type="button" class="accion" id="accionPantalla">
+              <span aria-hidden="true">⛶</span> Pantalla completa
+            </button>
+          </div>
+        </details>
+
         <button id="actualizar" class="btn-icono" type="button" title="Actualizar (tecla R)">
           <span class="btn-icono-glifo" aria-hidden="true">⟳</span>
           <span class="solo-lectores">Actualizar datos</span>
         </button>
       </div>
-    </div>
-
-    <div class="acciones" role="group" aria-label="Acciones del panel">
-      <button type="button" class="accion" id="accionReporte">
-        <span aria-hidden="true">📋</span> Copiar reporte
-      </button>
-      <button type="button" class="accion" id="accionCsv">
-        <span aria-hidden="true">⬇️</span> Descargar CSV
-      </button>
-      <button type="button" class="accion" id="accionCompartir">
-        <span aria-hidden="true">🔗</span> Compartir
-      </button>
-      <button type="button" class="accion" id="accionMapa">
-        <span aria-hidden="true">📍</span> Ver en el mapa
-      </button>
-      <button type="button" class="accion" id="accionImprimir">
-        <span aria-hidden="true">🖨️</span> Imprimir
-      </button>
-      <button type="button" class="accion" id="accionTema" aria-live="polite">
-        <span aria-hidden="true">🌗</span> Tema: automático
-      </button>
-      <button type="button" class="accion" id="accionPantalla">
-        <span aria-hidden="true">⛶</span> Pantalla completa
-      </button>
     </div>
 
     <div id="panelProyectos" class="panel-proyectos">
@@ -96,201 +105,226 @@
             <span id="laminaTipo">Rascacielos de usos mixtos</span>
           </figcaption>
         </figure>
-        <p class="lamina-nota">
-          Ilustración propia de la obra. El cielo y las luces siguen al clima real del sitio.
-        </p>
         <dl class="lamina-datos" id="laminaDatos"></dl>
       </div>
     </aside>
 
-    <!-- ===== Columna izquierda: toda la información ===== -->
+    <!-- ===== Columna izquierda ===== -->
     <div class="columna-info">
-    <!-- ===== Portada de la obra ===== -->
-    <section id="obra" class="tarjeta portada revelable">
-      <div class="portada-encabezado">
-        <div class="portada-titulo">
-          <span class="etiqueta">OBRA SELECCIONADA</span>
-          <h2>
-            <span class="bandera" id="obraBandera" aria-hidden="true">🇲🇽</span>
-            <span id="obraNombre">Torre Rise</span>
-          </h2>
-          <p class="portada-lugar">
-            <span id="obraCiudad">San Pedro Garza García, Nuevo León</span>
-            <span class="separador" aria-hidden="true">·</span>
-            <span id="obraPais">México</span>
-          </p>
+
+      <!-- Lo único siempre a la vista: qué obra es y si se puede colar -->
+      <section id="resumen" class="tarjeta revelable visible">
+        <div class="resumen-encabezado">
+          <div>
+            <span class="etiqueta">OBRA SELECCIONADA</span>
+            <h2 class="resumen-nombre">
+              <span class="bandera" id="obraBandera" aria-hidden="true">🇲🇽</span>
+              <span id="obraNombre">Torre Rise</span>
+            </h2>
+            <p class="resumen-lugar">
+              <span id="obraCiudad">San Pedro Garza García, Nuevo León</span>
+              <span class="separador" aria-hidden="true">·</span>
+              <span id="obraPais">México</span>
+            </p>
+          </div>
+          <span class="sello" id="veredictoSello">Calculando…</span>
         </div>
-        <div class="portada-chips" id="obraChips"></div>
-      </div>
 
-      <p class="portada-resumen" id="obraResumen"></p>
+        <div class="veredicto-cuerpo" id="veredicto">
+          <div class="medidor">
+            <svg viewBox="0 0 200 200" role="img" aria-labelledby="medidorTitulo">
+              <title id="medidorTitulo">Índice de riesgo para colado</title>
+              <circle class="medidor-pista" cx="100" cy="100" r="80"></circle>
+              <circle class="medidor-arco" id="medidorArco" cx="100" cy="100" r="80"></circle>
+            </svg>
+            <div class="medidor-centro">
+              <strong id="medidorValor">--</strong>
+              <span>índice de riesgo</span>
+            </div>
+          </div>
 
-      <div class="avance">
-        <div class="avance-cabeza">
-          <span>Avance de obra</span>
-          <strong id="avanceValor">—</strong>
-        </div>
-        <div class="avance-pista" role="img" id="avanceBarra" aria-label="Avance de obra">
-          <div class="avance-relleno" id="avanceRelleno"></div>
-        </div>
-        <p class="nota" id="avanceNota"></p>
-      </div>
-
-      <div class="cifras" id="obraCifras"></div>
-    </section>
-
-    <!-- ===== Centro de datos ===== -->
-    <section id="centro" class="tarjeta revelable">
-      <div class="titulo-seccion">
-        <div>
-          <span class="etiqueta">CENTRO DE DATOS</span>
-          <h2>Seguimiento del proyecto</h2>
-        </div>
-        <span class="leyenda" id="centroSello"></span>
-      </div>
-
-      <div class="tablero-kpi" id="tableroKpi"></div>
-
-      <div class="calendario">
-        <div class="calendario-cabeza">
-          <span>Calendario de la obra</span>
-          <strong id="calendarioVeredicto">—</strong>
-        </div>
-        <div class="calendario-pista" id="calendarioPista">
-          <div class="calendario-tiempo" id="calendarioTiempo"></div>
-          <div class="calendario-avance" id="calendarioAvance"></div>
-          <span class="calendario-hoy" id="calendarioHoy"><i></i>hoy</span>
-        </div>
-        <div class="calendario-pies">
-          <span id="calendarioDesde">—</span>
-          <span id="calendarioHasta">—</span>
-        </div>
-        <p class="nota" id="calendarioNota"></p>
-      </div>
-
-      <h3 class="subtitulo">Cronología de la obra</h3>
-      <ol class="cronologia" id="cronologia"></ol>
-    </section>
-
-    <!-- ===== Veredicto de colado ===== -->
-    <section id="veredicto" class="tarjeta revelable">
-      <div class="titulo-seccion">
-        <div>
-          <span class="etiqueta">VEREDICTO</span>
-          <h2>¿Se puede colar?</h2>
-        </div>
-        <span class="sello" id="veredictoSello">Calculando…</span>
-      </div>
-
-      <div class="veredicto-cuerpo">
-        <div class="medidor">
-          <svg viewBox="0 0 200 200" role="img" aria-labelledby="medidorTitulo">
-            <title id="medidorTitulo">Índice de riesgo para colado</title>
-            <circle class="medidor-pista" cx="100" cy="100" r="80"></circle>
-            <circle class="medidor-arco" id="medidorArco" cx="100" cy="100" r="80"></circle>
-          </svg>
-          <div class="medidor-centro">
-            <strong id="medidorValor">--</strong>
-            <span>índice de riesgo</span>
+          <div class="veredicto-detalle">
+            <p class="veredicto-frase" id="veredictoFrase">Consultando condiciones en sitio…</p>
+            <div class="ventana" id="ventana"></div>
+            <details class="desglose">
+              <summary>Ver el desglose de los cinco factores</summary>
+              <ul class="factores" id="factores"></ul>
+              <p class="nota">
+                El índice es una heurística propia que pondera lluvia, viento, temperatura,
+                humedad y radiación UV. Es orientativo: no sustituye el criterio del residente
+                de obra ni la norma del proyecto.
+              </p>
+            </details>
           </div>
         </div>
-
-        <div class="veredicto-detalle">
-          <p class="veredicto-frase" id="veredictoFrase">Consultando condiciones en sitio…</p>
-          <ul class="factores" id="factores"></ul>
-          <div class="ventana" id="ventana"></div>
-        </div>
-      </div>
-
-      <p class="nota">
-        El índice es una heurística propia que pondera lluvia, viento, temperatura, humedad y radiación UV.
-        Es orientativo: no sustituye el criterio del residente de obra ni la norma del proyecto.
-      </p>
-    </section>
-
-    <!-- ===== Condiciones actuales ===== -->
-    <section id="condiciones" class="tarjeta revelable">
-      <div class="titulo-seccion">
-        <div>
-          <span class="etiqueta">AHORA MISMO</span>
-          <h2>Condiciones en sitio</h2>
-        </div>
-        <span class="momento" id="momentoEtiqueta"></span>
-      </div>
-      <div class="metricas" id="metricas"></div>
-      <p class="nota" id="ultima-actualizacion"></p>
-    </section>
-
-    <!-- ===== Viento y sol ===== -->
-    <div class="dupla">
-      <section id="viento" class="tarjeta revelable">
-        <span class="etiqueta">VIENTO</span>
-        <h2>Rosa de los vientos</h2>
-        <div class="viento-cuerpo">
-          <div class="compas" id="compas"></div>
-          <dl class="viento-datos" id="vientoDatos"></dl>
-        </div>
       </section>
 
-      <section id="sol" class="tarjeta revelable">
-        <span class="etiqueta">LUZ DE TRABAJO</span>
-        <h2>Arco solar</h2>
-        <div class="sol-cuerpo" id="solCuerpo"></div>
-      </section>
-    </div>
+      <!-- ===== Pestañas ===== -->
+      <nav class="pestanas" role="tablist" aria-label="Secciones del panel">
+        <button type="button" class="pestana" role="tab" id="tab-hoy"
+          aria-controls="panel-hoy" aria-selected="true">
+          <span aria-hidden="true">🌡️</span> Hoy
+        </button>
+        <button type="button" class="pestana" role="tab" id="tab-pronostico"
+          aria-controls="panel-pronostico" aria-selected="false">
+          <span aria-hidden="true">📈</span> Pronóstico
+        </button>
+        <button type="button" class="pestana" role="tab" id="tab-proyecto"
+          aria-controls="panel-proyecto" aria-selected="false">
+          <span aria-hidden="true">🏗️</span> Proyecto
+        </button>
+        <button type="button" class="pestana" role="tab" id="tab-obras"
+          aria-controls="panel-obras" aria-selected="false">
+          <span aria-hidden="true">🌎</span> Obras
+        </button>
+      </nav>
 
-    <!-- ===== Próximas 24 horas ===== -->
-    <section id="horas" class="tarjeta revelable">
-      <div class="titulo-seccion">
-        <div>
-          <span class="etiqueta">PRÓXIMAS 24 HORAS</span>
-          <h2>Pronóstico hora por hora</h2>
+      <!-- ===== Pestaña: Hoy ===== -->
+      <div class="panel" id="panel-hoy" role="tabpanel" aria-labelledby="tab-hoy">
+        <section id="condiciones" class="tarjeta revelable">
+          <div class="titulo-seccion">
+            <div>
+              <span class="etiqueta">AHORA MISMO</span>
+              <h2>Condiciones en sitio</h2>
+            </div>
+            <span class="momento" id="momentoEtiqueta"></span>
+          </div>
+          <div class="metricas" id="metricas"></div>
+          <p class="nota" id="ultima-actualizacion"></p>
+        </section>
+
+        <div class="dupla">
+          <section id="viento" class="tarjeta revelable">
+            <span class="etiqueta">VIENTO</span>
+            <h2>Rosa de los vientos</h2>
+            <div class="viento-cuerpo">
+              <div class="compas" id="compas"></div>
+              <dl class="viento-datos" id="vientoDatos"></dl>
+            </div>
+          </section>
+
+          <section id="sol" class="tarjeta revelable">
+            <span class="etiqueta">LUZ DE TRABAJO</span>
+            <h2>Arco solar</h2>
+            <div class="sol-cuerpo" id="solCuerpo"></div>
+          </section>
         </div>
-        <span class="leyenda">
-          <i class="punto punto-lluvia" aria-hidden="true"></i> probabilidad de lluvia
-          <i class="punto punto-riesgo" aria-hidden="true"></i> riesgo de colado
-        </span>
       </div>
-      <div class="tira" id="tiraHoras"></div>
-    </section>
 
-    <!-- ===== Siete días ===== -->
-    <section id="dias" class="tarjeta revelable">
-      <span class="etiqueta">PLANEACIÓN</span>
-      <h2>Los próximos 7 días</h2>
-      <div class="dias-lista" id="diasLista"></div>
-    </section>
+      <!-- ===== Pestaña: Pronóstico ===== -->
+      <div class="panel" id="panel-pronostico" role="tabpanel" aria-labelledby="tab-pronostico" hidden>
+        <section id="horas" class="tarjeta revelable">
+          <div class="titulo-seccion">
+            <div>
+              <span class="etiqueta">PRÓXIMAS 24 HORAS</span>
+              <h2>Hora por hora</h2>
+            </div>
+            <span class="leyenda">
+              <i class="punto punto-lluvia" aria-hidden="true"></i> lluvia
+              <i class="punto punto-riesgo" aria-hidden="true"></i> riesgo
+            </span>
+          </div>
+          <div class="tira" id="tiraHoras"></div>
+        </section>
 
-    <!-- ===== Comparativa de todas las obras ===== -->
-    <section id="flota" class="tarjeta revelable">
-      <div class="titulo-seccion">
-        <div>
-          <span class="etiqueta">PANORAMA</span>
-          <h2>Todas las obras ahora</h2>
-        </div>
-        <span class="leyenda">Ordenadas de menor a mayor riesgo</span>
+        <section id="dias" class="tarjeta revelable">
+          <span class="etiqueta">PLANEACIÓN</span>
+          <h2>Los próximos 7 días</h2>
+          <div class="dias-lista" id="diasLista"></div>
+        </section>
       </div>
-      <div class="flota-grid" id="flotaGrid"></div>
-    </section>
 
-    <!-- ===== Ficha técnica ===== -->
-    <section id="ficha" class="tarjeta revelable">
-      <span class="etiqueta">EXPEDIENTE</span>
-      <h2>Ficha técnica del proyecto</h2>
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Dato</th>
-            <th scope="col">Valor</th>
-          </tr>
-        </thead>
-        <tbody id="fichaCuerpo"></tbody>
-      </table>
-      <div class="fuentes">
-        <h3>Fuentes de las cifras</h3>
-        <ul id="fichaFuentes"></ul>
+      <!-- ===== Pestaña: Proyecto ===== -->
+      <div class="panel" id="panel-proyecto" role="tabpanel" aria-labelledby="tab-proyecto" hidden>
+        <section id="obra" class="tarjeta revelable">
+          <span class="etiqueta">EL PROYECTO</span>
+          <h2>De qué obra se trata</h2>
+          <div class="portada-chips" id="obraChips"></div>
+          <p class="portada-resumen" id="obraResumen"></p>
+
+          <div class="avance">
+            <div class="avance-cabeza">
+              <span>Avance de obra</span>
+              <strong id="avanceValor">—</strong>
+            </div>
+            <div class="avance-pista" role="img" id="avanceBarra" aria-label="Avance de obra">
+              <div class="avance-relleno" id="avanceRelleno"></div>
+            </div>
+            <p class="nota" id="avanceNota"></p>
+          </div>
+
+          <div class="cifras" id="obraCifras"></div>
+        </section>
+
+        <section id="centro" class="tarjeta revelable">
+          <div class="titulo-seccion">
+            <div>
+              <span class="etiqueta">SEGUIMIENTO</span>
+              <h2>Centro de datos</h2>
+            </div>
+            <span class="leyenda" id="centroSello"></span>
+          </div>
+
+          <div class="tablero-kpi" id="tableroKpi"></div>
+
+          <div class="calendario">
+            <div class="calendario-cabeza">
+              <span>Calendario de la obra</span>
+              <strong id="calendarioVeredicto">—</strong>
+            </div>
+            <div class="calendario-pista" id="calendarioPista">
+              <div class="calendario-tiempo" id="calendarioTiempo"></div>
+              <div class="calendario-avance" id="calendarioAvance"></div>
+              <span class="calendario-hoy" id="calendarioHoy"><i></i>hoy</span>
+            </div>
+            <div class="calendario-pies">
+              <span id="calendarioDesde">—</span>
+              <span id="calendarioHasta">—</span>
+            </div>
+            <p class="nota" id="calendarioNota"></p>
+          </div>
+
+          <details class="desglose">
+            <summary>Ver la cronología de la obra</summary>
+            <ol class="cronologia" id="cronologia"></ol>
+          </details>
+        </section>
+
+        <section id="ficha" class="tarjeta revelable">
+          <span class="etiqueta">EXPEDIENTE</span>
+          <h2>Ficha técnica</h2>
+          <details class="desglose">
+            <summary>Ver la tabla de datos y las fuentes</summary>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Dato</th>
+                  <th scope="col">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="fichaCuerpo"></tbody>
+            </table>
+            <div class="fuentes">
+              <h3>Fuentes de las cifras</h3>
+              <ul id="fichaFuentes"></ul>
+            </div>
+          </details>
+        </section>
       </div>
-    </section>
+
+      <!-- ===== Pestaña: Obras ===== -->
+      <div class="panel" id="panel-obras" role="tabpanel" aria-labelledby="tab-obras" hidden>
+        <section id="flota" class="tarjeta revelable">
+          <div class="titulo-seccion">
+            <div>
+              <span class="etiqueta">PANORAMA</span>
+              <h2>Todas las obras ahora</h2>
+            </div>
+            <span class="leyenda">De menor a mayor riesgo</span>
+          </div>
+          <div class="flota-grid" id="flotaGrid"></div>
+        </section>
+      </div>
     </div>
   </main>
 
@@ -301,9 +335,9 @@
       y fueron revisadas en octubre de 2026.
     </p>
     <p class="nota">
-      Atajos: <kbd>←</kbd> <kbd>→</kbd> cambiar de obra · <kbd>R</kbd> actualizar · <kbd>Esc</kbd> cerrar el panel.
+      Atajos: <kbd>←</kbd> <kbd>→</kbd> cambiar de obra · <kbd>1</kbd>–<kbd>4</kbd> cambiar de pestaña ·
+      <kbd>R</kbd> actualizar · <kbd>Esc</kbd> cerrar paneles.
       Puedes abrir una obra directamente con <code>?obra=jeddah-tower</code> en la dirección.
-      El panel pasa a tema oscuro cuando en el sitio ya es de noche.
     </p>
   </footer>
 

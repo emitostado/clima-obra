@@ -1,7 +1,14 @@
 # Clima-obra
 
 ## ¿Qué hace la página?
-La página es un panel de clima para obras de construcción. Para la obra que elijas muestra:
+La página es un panel de clima para obras de construcción. Arriba y siempre a la vista queda lo único que hay que decidir: **qué obra es y si se puede colar**, con el índice de riesgo y la mejor ventana del día. Todo lo demás está repartido en cuatro pestañas para no saturar:
+
+- **Hoy** — las condiciones en sitio, la rosa de los vientos y el arco solar.
+- **Pronóstico** — las próximas 24 horas y los 7 días.
+- **Proyecto** — de qué obra se trata, su avance, el centro de datos y la ficha técnica.
+- **Obras** — las siete obras comparadas, de menor a mayor riesgo.
+
+Para la obra que elijas muestra:
 
 - Las **condiciones actuales**: temperatura y sensación térmica, humedad, punto de rocío, precipitación, viento, ráfagas, nubosidad, índice UV y presión.
 - Un **índice de riesgo de colado** del 0 al 100, con el veredicto (apto, apto con vigilancia, precaución o suspender) y el desglose de qué factor pesa más.
@@ -66,7 +73,9 @@ Hay que descargar o clonar los archivos y abrir `index.html` en un navegador. Se
 - `app.js` — la consulta a la API, el cálculo del riesgo y el pintado del panel.
 
 ## Atajos
-`←` `→` cambiar de obra · `R` actualizar · `Esc` cerrar el panel de obras.
+`←` `→` cambiar de obra · `1`–`4` cambiar de pestaña · `R` actualizar · `Esc` cerrar los paneles.
+
+También se puede llegar directo a una pestaña: `?obra=jeddah-tower#proyecto`.
 
 ## Aviso
 El índice de riesgo es una heurística propia que pondera lluvia, viento, temperatura, humedad y radiación UV. Es orientativo y no sustituye el criterio del residente de obra ni la norma del proyecto.
