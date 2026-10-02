@@ -11,6 +11,8 @@ La página es un panel de clima para obras de construcción. Para la obra que el
 - Una **comparativa de todas las obras** ordenadas de menor a mayor riesgo.
 - La **ficha técnica** de la obra con sus fuentes.
 
+El panel va en dos columnas: a la izquierda toda la información y a la derecha la obra dibujada, que se queda fija mientras bajas. Las ilustraciones son propias, hechas en SVG, y toman el color del tema: de noche se les encienden las ventanas. Además la silueta de la obra vuela por el fondo, muy tenue, junto con el clima.
+
 El fondo cambia según el clima real del sitio: llueve con gotas inclinadas por el viento que de verdad sopla, caen rayos en las tormentas, el sol gira sus rayos, hay nubes, niebla, nieve o estrellas. Cuando en la obra ya es de noche, todo el panel pasa a tema oscuro.
 
 ### Liga pública
@@ -44,6 +46,7 @@ Hay que descargar o clonar los archivos y abrir `index.html` en un navegador. Se
 - `index.html` — la estructura del panel.
 - `estilos.css` — los estilos, el tema de día y de noche, y las animaciones del clima.
 - `datos.js` — el catálogo de obras con sus cifras y sus fuentes.
+- `siluetas.js` — las ilustraciones en SVG de cada obra.
 - `app.js` — la consulta a la API, el cálculo del riesgo y el pintado del panel.
 
 ## Atajos
